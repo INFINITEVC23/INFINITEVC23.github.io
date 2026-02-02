@@ -2,99 +2,75 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Server Store</title>
-<link rel="stylesheet" href="styles.css">
+<title>MC Shop</title>
+<script src="products.js"></script>
 <style>
-body{margin:0;font-family:Arial;background:#f8fafc;color:#0f172a}
-.header{background:#0f172a;color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
-.header .logo{font-size:20px;font-weight:700}
-.header button{padding:10px 14px;background:#16a34a;border:none;color:white;border-radius:6px;cursor:pointer;font-weight:600}
-.header button:hover{background:#15803d}
-.wrap{max-width:1200px;margin:24px auto;padding:0 16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
-.card{background:white;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:14px;display:flex;flex-direction:column}
-.card img{width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:10px}
-.card button{margin-top:auto;padding:10px;border:none;border-radius:6px;background:#2563eb;color:white;font-weight:600;cursor:pointer}
-.card button:hover{background:#1d4ed8}
-
-/* Cart mini box */
-.cartBox{position:fixed;bottom:20px;right:20px;width:300px;background:white;box-shadow:0 4px 12px rgba(0,0,0,.15);padding:16px;border-radius:10px;display:none;z-index:999;}
-.cartBox h2{margin-top:0;font-size:16px}
-.cartBox ul{max-height:200px;overflow:auto;margin:6px 0;padding-left:18px}
-.cartBox input{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1;margin-top:6px}
-.cartBox button{width:100%;margin-top:10px;padding:10px;border:none;border-radius:6px;background:#16a34a;color:white;font-weight:700;cursor:pointer}
-.cartBox .close{position:absolute;top:8px;right:10px;cursor:pointer;font-weight:bold;color:#ef4444}
+body{font-family:Arial;margin:20px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:20px;}
+.card{border:1px solid #ccc;padding:10px;text-align:center;border-radius:8px;}
+button{margin-top:5px;padding:5px 10px;cursor:pointer;}
+#cart{position:fixed;top:10px;right:10px;border:1px solid #333;padding:10px;background:white;}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="logo">Server Store</div>
-  <button onclick="toggleCart()">🛒 Cart</button>
-</div>
 
-<div class="wrap">
-  <div id="shop" class="grid"></div>
-</div>
+<h1>MC Shop</h1>
+<div class="grid" id="productGrid"></div>
 
-<div id="cartBox" class="cartBox">
-  <span class="close" onclick="toggleCart()">✖</span>
-  <h2>Cart</h2>
+<div id="cart">
+  <h3>Cart</h3>
   <ul id="cartList"></ul>
-  <p><b>Total:</b> <span id="total">0</span></p>
-  <input id="username" placeholder="Minecraft Username">
-  <button onclick="checkout()">Place Order</button>
-  <p id="status"></p>
+  <input type="text" id="mcUsername" placeholder="Minecraft Username">
+  <button onclick="checkout()">Send Order</button>
 </div>
 
-<script src="products.js"></script>
 <script>
-let cart=[]; let total=0; 
-const cartBox=document.getElementById('cartBox');
+let cart = [];
 
-function toggleCart(){cartBox.style.display=cartBox.style.display==='block'?'none':'block'}
-
-const products = getProducts();
-
-function renderShop(){
-  const shop=document.getElementById('shop');
-  shop.innerHTML='';
-  products.forEach(p=>{
-    const d=document.createElement('div');
-    d.className='card';
-    d.innerHTML=`<img src="${p.image}"><h3>${p.name}</h3>
-                 <div>${p.price} coins</div>
-                 <button onclick="addToCart('${p.name}','${p.price}')">Add</button>`;
-    shop.appendChild(d);
+function renderProducts(){
+  const grid = document.getElementById('productGrid');
+  grid.innerHTML = '';
+  products.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className='card';
+    div.innerHTML = `
+      <img src="${p.image}" width="100"><br>
+      ${p.name} - ${p.price}<br>
+      <button onclick="addToCart(${i})">Add to Cart</button>
+    `;
+    grid.appendChild(div);
   });
 }
 
-function addToCart(name,price){cart.push({name,price}); total+=Number(price); renderCart()}
+function addToCart(index){
+  cart.push(products[index]);
+  renderCart();
+}
 
 function renderCart(){
-  const list=document.getElementById('cartList');
-  list.innerHTML='';
-  cart.forEach(i=>{
-    const li=document.createElement('li');
-    li.textContent=i.name+' - '+i.price;
+  const list = document.getElementById('cartList');
+  list.innerHTML = '';
+  cart.forEach(p=>{
+    const li = document.createElement('li');
+    li.textContent = `${p.name} - ${p.price}`;
     list.appendChild(li);
   });
-  document.getElementById('total').textContent=total;
 }
 
-async function checkout(){
-  const user=document.getElementById('username').value.trim();
-  if(!user){alert('Enter username'); return;}
-  if(cart.length===0){alert('Cart empty'); return;}
-  const webhook='YOUR_WEBHOOK_URL';
-  const payload={content:`New order\nUser: ${user}\n${cart.map(i=>'- '+i.name+' '+i.price).join('\n')}\nTotal: ${total}`};
-  try{
-    await fetch(webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    document.getElementById('status').textContent='Order sent';
-    cart.length=0; total=0; renderCart(); document.getElementById('username').value='';
-  }catch{document.getElementById('status').textContent='Send failed'}
+function checkout(){
+  const username = document.getElementById('mcUsername').value.trim();
+  if(!username){alert("Enter Minecraft username"); return;}
+  if(cart.length===0){alert("Cart is empty"); return;}
+  const webhook = "YOUR_DISCORD_WEBHOOK_URL";
+  const items = cart.map(p=>`${p.name} - ${p.price}`).join("\n");
+  fetch(webhook,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({content:`New order from ${username}:\n${items}`})
+  }).then(()=>{alert("Order sent!"); cart=[]; renderCart(); document.getElementById('mcUsername').value='';});
 }
 
-renderShop();
+renderProducts();
 </script>
 </body>
 </html>
