@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<style>
+body{font-family:Arial;background:#f8fafc;color:#0f172a;padding:24px}
+textarea{width:100%;height:200px;border-radius:6px;border:1px solid #cbd5e1;padding:10px;font-family:monospace;}
+button{padding:10px 14px;margin-top:10px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer}
+button:hover{background:#1d4ed8}
+</style>
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+<p>Edit products Base64 string below (from products.js)</p>
+<textarea id="productsBase64"></textarea>
+<br>
+<button onclick="saveProducts()">Save Products</button>
+<p id="status"></p>
 
+<script>
+const fsPlaceholder = "// Paste your products Base64 from products.js here";
+document.getElementById('productsBase64').value = fsPlaceholder;
+
+function saveProducts(){
+  const val=document.getElementById('productsBase64').value.trim();
+  if(!val){alert('Cannot be empty'); return;}
+  // In practice, you manually replace products.js with this string and push to GitHub
+  document.getElementById('status').textContent = "Copy this Base64 and replace products.js: \n" + val;
+}
+</script>
+</body>
+</html>
