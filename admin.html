@@ -3,31 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin Dashboard</title>
+<link rel="stylesheet" href="styles.css">
 <style>
-body{font-family:Arial;background:#f8fafc;color:#0f172a;padding:24px}
-textarea{width:100%;height:200px;border-radius:6px;border:1px solid #cbd5e1;padding:10px;font-family:monospace;}
-button{padding:10px 14px;margin-top:10px;background:#2563eb;color:white;border:none;border-radius:6px;cursor:pointer}
-button:hover{background:#1d4ed8}
+#productList{margin-top:20px;}
+.product-row{display:flex;gap:10px;margin-bottom:10px;align-items:center;}
+.product-row input{flex:1;padding:6px;border:1px solid #cbd5e1;border-radius:4px;}
+.product-row button{padding:6px 10px;background:#ef4444;color:white;border:none;border-radius:4px;cursor:pointer;}
+.product-row button:hover{background:#dc2626;}
 </style>
 </head>
 <body>
-<h1>Admin Dashboard</h1>
-<p>Edit products Base64 string below (from products.js)</p>
-<textarea id="productsBase64"></textarea>
-<br>
-<button onclick="saveProducts()">Save Products</button>
-<p id="status"></p>
+<div class="wrap">
+  <h1>Admin Dashboard</h1>
+  
+  <h2>Add Product</h2>
+  <div class="product-row">
+    <input type="text" id="name" placeholder="Product Name">
+    <input type="number" id="price" placeholder="Price">
+    <input type="text" id="image" placeholder="Image URL (optional)">
+    <button onclick="addProduct()">Add</button>
+  </div>
+  
+  <h2>Current Products</h2>
+  <div id="productList"></div>
+  
+  <h2>New Base64 for products.js</h2>
+  <textarea id="base64Output"></textarea>
+  <button class="admin-button" onclick="generateBase64()">Generate Base64</button>
+  <p>Copy the above Base64 and replace <code>products.js</code> in your repo.</p>
+</div>
 
 <script>
-const fsPlaceholder = "// Paste your products Base64 from products.js here";
-document.getElementById('productsBase64').value = fsPlaceholder;
-
-function saveProducts(){
-  const val=document.getElementById('productsBase64').value.trim();
-  if(!val){alert('Cannot be empty'); return;}
-  // In practice, you manually replace products.js with this string and push to GitHub
-  document.getElementById('status').textContent = "Copy this Base64 and replace products.js: \n" + val;
+// Load existing products from products.js
+let products = [];
+if(window.productsBase64){
+  products = JSON.parse(atob(productsBase64));
 }
+
+function renderProducts(){
+  const list = document.getElementById('productList');
+  list.innerHTML = '';
+  products.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className = 'product-row';
+    div.innerHTML = `
+      <input value="${p.name}" onchange="products[${i}].name=this.value">
+      <input type="number" value="${p.price}" onchange="products[${i}].price=this.value">
+      <input value="${p.image||''}" onchange="products[${i}].image=this.value">
+      <button onclick="deleteProduct(${i})">Delete</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addProduct(){
+  const name = document.getElementById('name').value.trim();
+  const price = document.getElementById('price').value.trim();
+  const image = document.getElementById('image').value.trim();
+  if(!name || !price){alert('Name and price required'); return;}
+  products.push({name,price,image});
+  renderProducts();
+  document.getElementById('name').value='';
+  document.getElementById('price').value='';
+  document.getElementById('image').value='';
+}
+
+function deleteProduct(idx){
+  products.splice(idx,1);
+  renderProducts();
+}
+
+function generateBase64(){
+  const base64 = btoa(JSON.stringify(products));
+  document.getElementById('base64Output').value = base64;
+}
+
+renderProducts();
 </script>
 </body>
 </html>
