@@ -21,7 +21,6 @@
             font-family: 'Inter', sans-serif; 
             background: #f1f5f9; 
             color: #1e293b; 
-            padding-bottom: 120px; 
         }
 
         .hero {
@@ -35,7 +34,7 @@
         .hero h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
         .hero p { opacity: 0.8; margin-top: 10px; }
 
-        .container { max-width: 1100px; margin: -30px auto 0; padding: 0 20px; }
+        .container { max-width: 1100px; margin: -30px auto 100px; padding: 0 20px; }
 
         .grid { 
             display: grid; 
@@ -78,13 +77,14 @@
         .price-val { color: var(--primary); }
 
         button { 
-            width: 100%; padding: 10px; border: none; border-radius: 6px; 
+            width: 100%; padding: 12px; border: none; border-radius: 8px; 
             background: var(--primary); color: white; font-weight: 700; 
             cursor: pointer; transition: 0.2s;
         }
         button:hover { background: var(--primary-dark); }
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
 
+        /* --- FULLSCREEN PANEL OVERRIDES --- */
         .cart-toggle {
             position: fixed; bottom: 20px; right: 20px;
             background: var(--dark); color: white; padding: 15px 25px;
@@ -94,60 +94,49 @@
         }
 
         .cart-panel {
-            position: fixed; bottom: 85px; right: 20px;
-            width: 340px; background: white; border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            border: 1px solid var(--border); z-index: 1000;
-            display: none; flex-direction: column; overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 2000;
+            display: none; flex-direction: column;
         }
         .cart-panel.active { display: flex; }
 
-        .cart-header { background: var(--dark); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .cart-body { padding: 15px; max-height: 300px; overflow-y: auto; }
+        .cart-header { 
+            background: var(--dark); color: white; padding: 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            font-size: 1.2rem;
+        }
+        .cart-body { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; }
         
         .cart-item { 
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;
+            padding: 15px; background: white; border-radius: 10px;
+            margin-bottom: 10px; border: 1px solid var(--border);
         }
 
-        .remove-btn { color: var(--danger); cursor: pointer; font-weight: bold; margin-left: 10px; }
+        .remove-btn { color: var(--danger); cursor: pointer; font-weight: bold; font-size: 18px; }
 
         .total-section { 
-            padding: 15px; background: #f8fafc; border-top: 1px solid var(--border);
-            font-size: 14px; font-weight: 700;
+            padding: 20px; background: white; border-top: 2px solid var(--border);
+            font-size: 16px; font-weight: 800;
         }
 
-        .total-row { display: flex; justify-content: space-between; color: var(--dark); margin-bottom: 4px; }
+        .total-row { display: flex; justify-content: space-between; color: var(--dark); margin-bottom: 5px; }
 
-        .checkout-area { padding: 15px; border-top: 1px solid var(--border); }
+        .checkout-area { 
+            padding: 20px; border-top: 1px solid var(--border); background: white;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
         
         input { 
-            width: 100%; padding: 10px; border: 1px solid var(--border); 
-            border-radius: 6px; margin-bottom: 10px; box-sizing: border-box;
+            width: 100%; padding: 15px; border: 1px solid var(--border); 
+            border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
+            font-size: 16px;
         }
 
-        /* --- MOBILE SUPPORT --- */
         @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .hero h1 { font-size: 1.8rem; }
-            .grid { 
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-                gap: 10px; 
-            }
-            .container { margin: -20px auto 0; padding: 0 10px; }
-            .card { padding: 12px; }
-            .card h3 { font-size: 0.9rem; }
-            
-            .cart-panel {
-                width: calc(100% - 40px);
-                right: 20px;
-                left: 20px;
-                bottom: 85px;
-            }
-            .cart-toggle {
-                width: calc(100% - 70px);
-                text-align: center;
-                justify-content: center;
-            }
+            .cart-toggle { right: 10px; left: 10px; text-align: center; justify-content: center; width: auto; }
         }
     </style>
 </head>
@@ -163,29 +152,30 @@
     </div>
 
     <div class="cart-toggle" onclick="toggleCart()">
-        🛒 <span id="cartBtnText">Handlekurv (0)</span>
+        ð <span id="cartBtnText">Handlekurv (0)</span>
     </div>
 
     <div id="cartPanel" class="cart-panel">
         <div class="cart-header">
             <strong>Din Handlekurv</strong>
-            <span style="cursor:pointer" onclick="toggleCart()">✕</span>
+            <span style="font-size: 30px; cursor:pointer" onclick="toggleCart()">â</span>
         </div>
         <div class="cart-body" id="cartItems">
-            <p style="text-align:center; color:#64748b;">Kurven er tom</p>
+            <p style="text-align:center; color:#64748b; margin-top: 50px;">Kurven er tom</p>
         </div>
         
         <div id="totalSection" class="total-section" style="display:none;"></div>
 
         <div class="checkout-area">
-            <input type="text" id="mcUsername" placeholder="Ditt Minecraft-navn">
-            <button class="btn-checkout" id="checkoutBtn" onclick="sendOrder()" style="background:var(--success)">Send Bestilling</button>
+            <input type="text" id="mcUsername" placeholder="Ditt Minecraft-navn...">
+            <button class="btn-checkout" id="checkoutBtn" onclick="sendOrder()" style="background:var(--success); height: 60px; font-size: 18px;">SEND BESTILLING</button>
         </div>
     </div>
 
 <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1467952378144624681/eYXQSuHoHn9MBFcA4FsaANkSjgbJ2ncNoOICyY3uMoxXbYl0mIrqyqvqvimd0eIhAsfO";
 
+    // ALLE DINE 17 PRODUKTER ER BEHOLDT HER
     const products = [
         { id: 1, name: "Diamond Helmet", price: 21, cur: "Iron", img: "https://minecraft.wiki/images/Invicon_Diamond_Helmet.png", stock: true },
         { id: 2, name: "Diamond Chestplate", price: 38, cur: "Iron", img: "https://minecraft.wiki/images/Invicon_Diamond_Chestplate.png", stock: true },
@@ -213,7 +203,7 @@
         grid.innerHTML = products.map(p => `
             <div class="card">
                 <div class="status-badge ${p.stock ? 'status-instock' : 'status-outstock'}">
-                    ${p.stock ? 'På lager' : 'Utsolgt'}
+                    ${p.stock ? 'PÃ¥ lager' : 'Utsolgt'}
                 </div>
                 <img src="${p.img}" alt="${p.name}">
                 <h3 style="font-size: 1rem; text-align: center; margin: 10px 0;">${p.name} ${p.max ? `<br><small>(Maks ${p.max})</small>` : ''}</h3>
@@ -226,13 +216,15 @@
     }
 
     function toggleCart() {
-        document.getElementById('cartPanel').classList.toggle('active');
+        const panel = document.getElementById('cartPanel');
+        panel.classList.toggle('active');
+        document.body.style.overflow = panel.classList.contains('active') ? 'hidden' : 'auto';
     }
 
     function addToCart(id) {
         const p = products.find(x => x.id === id);
         if (p.max && (cart[id] || 0) >= p.max) {
-            alert(`Begrensning: Du kan bare kjøpe ${p.max} stk ${p.name}.`);
+            alert(`Begrensning: Du kan bare kjÃ¸pe ${p.max} stk ${p.name}.`);
             return;
         }
         cart[id] = (cart[id] || 0) + 1;
@@ -258,7 +250,7 @@
         let totals = {};
 
         if (keys.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#64748b;">Kurven er tom</p>';
+            container.innerHTML = '<p style="text-align:center; color:#64748b; margin-top:50px;">Kurven er tom</p>';
             totalSection.style.display = 'none';
         } else {
             totalSection.style.display = 'block';
@@ -274,7 +266,7 @@
                 return `
                     <div class="cart-item">
                         <span><strong>${qty}x</strong> ${p.name}</span>
-                        <span>${linePrice} ${p.cur} <span class="remove-btn" onclick="removeFromCart(${id})">✕</span></span>
+                        <span>${linePrice} ${p.cur} <span class="remove-btn" onclick="removeFromCart(${id})">â</span></span>
                     </div>
                 `;
             }).join('');
@@ -302,14 +294,14 @@
         const itemsList = keys.map(id => {
             const p = products.find(x => x.id == id);
             totals[p.cur] = (totals[p.cur] || 0) + (cart[id] * p.price);
-            return `• ${cart[id]}x **${p.name}** (${cart[id] * p.price} ${p.cur})`;
+            return `â¢ ${cart[id]}x **${p.name}** (${cart[id] * p.price} ${p.cur})`;
         }).join("\n");
 
         const totalString = Object.keys(totals).map(cur => `${cur}: **${totals[cur]}**`).join("\n");
 
         const payload = {
             embeds: [{
-                title: "💎 Ny Bestilling!",
+                title: "ð Ny Bestilling!",
                 color: 23295,
                 fields: [
                     { name: "Spiller", value: `\`${user}\``, inline: true },
@@ -329,7 +321,7 @@
             });
 
             if (res.ok) {
-                alert("Takk! For bestillingen. Kontakt infinite.py på discord for oppdateringer");
+                alert("Takk! For bestillingen. Kontakt infinite.py pÃ¥ discord for oppdateringer");
                 cart = {};
                 saveCart();
                 document.getElementById('mcUsername').value = "";
@@ -338,7 +330,7 @@
                 throw new Error("Feil ved sending"); 
             }
         } catch (e) {
-            alert("Kunne ikke sende bestilling. Sjekk internett eller om Webhook-URL-en er gyldig.");
+            alert("Kunne ikke sende bestilling. Sjekk internett.");
         } finally {
             btn.disabled = false;
             btn.innerText = "Send Bestilling";
