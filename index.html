@@ -1,1 +1,222 @@
-Nettside er stengt. Vent til den er åpnen
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Shop (Wflo50 sin Server)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --p: #6366f1; --d: #0f172a; --bg: #f8fafc; --s: #10b981; --out: #ef4444; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--d); }
+        .hero { background: linear-gradient(135deg, var(--d) 0%, #1e293b 100%); color: white; padding: 60px 20px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; max-width: 1200px; margin: -30px auto 50px; padding: 0 20px; }
+        .card { background: white; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: 0.3s; position: relative; }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 70px; height: 70px; image-rendering: pixelated; margin-bottom: 15px; }
+        .status-badge { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .buy-btn { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
+        .buy-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .cart-toggle { position: fixed; bottom: 30px; right: 30px; padding: 18px 28px; background: var(--d); color: white; border-radius: 50px; cursor: pointer; z-index: 100; border: none; font-weight: bold; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+        #cart-panel { position: fixed; bottom: 100px; right: 30px; width: 320px; background: white; border-radius: 24px; display: none; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); z-index: 101; border: 1px solid #eee; overflow: hidden; }
+        #chat-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 25px; overflow-y: auto; background: #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 12px; border-radius: 12px; max-width: 70%; font-size: 14px; }
+        .u-msg { background: var(--p); color: white; align-self: flex-end; }
+        .a-msg { background: white; align-self: flex-start; border: 1px solid #ddd; }
+        .input-box { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; font-family: inherit; }
+        .total-box { background: #f1f5f9; padding: 15px; margin-bottom: 15px; border-radius: 12px; font-size: 14px; font-weight: 700; color: var(--d); border: 1px dashed #cbd5e1; }
+        
+        /* GUL BOKS STIL */
+        .info-boks { background: #fef9c3; border: 1px solid #facc15; color: #854d0e; padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 13px; font-weight: 600; }
+        .copy-btn { background: #eab308; color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 8px; font-size: 11px; }
+        .copy-btn:hover { background: #ca8a04; }
+    </style>
+</head>
+<body>
+
+<div id="shop-page">
+    <div class="hero">
+        <h1>Infinite Shop</h1>
+        <p>Beste market for Wflo50 sin Server</p>
+    </div>
+    
+    <div class="grid" id="productGrid"></div>
+    
+    <button class="cart-toggle" onclick="toggleCart()">🛒 Kurv (<span id="cartCount">0</span>)</button>
+
+    <div id="cart-panel">
+        <div style="padding:20px; background:var(--d); color:white; display:flex; justify-content:space-between; align-items:center;">
+            <strong>Din Kurv</strong>
+            <span onclick="toggleCart()" style="cursor:pointer; font-size:20px;">&times;</span>
+        </div>
+        <div id="cartItems" style="padding:20px; max-height:200px; overflow-y:auto; border-bottom:1px solid #eee;"></div>
+        <div style="padding:20px;">
+            <div class="info-boks">
+                ⚠️ Husk å kopiere URL-en til ordren din når du har bestilt, slik at du kan finne tilbake til chatten!
+            </div>
+            
+            <div id="totalDisplay" class="total-box">Total: 0</div>
+            <input type="text" id="mcName" placeholder="Minecraft Navn" class="input-box">
+            <input type="password" id="orderPass" placeholder="Lag et passord" class="input-box">
+            <button onclick="placeOrder()" style="width:100%; background:var(--s); color:white; padding:15px; border:none; border-radius:12px; cursor:pointer; font-weight:bold;">BEKREFT ORDRE</button>
+        </div>
+    </div>
+</div>
+
+<div id="chat-page">
+    <div style="padding:20px; background:var(--d); color:white; display:flex; justify-content:space-between; align-items:center;">
+        <strong id="chatTitle">Ordre Chat</strong>
+        <button onclick="location.href=location.pathname" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer;">Lukk</button>
+    </div>
+
+    <div style="padding: 15px 20px 0 20px; background: #f1f5f9;">
+        <div class="info-boks" style="margin:0;">
+            VIKTIG!!! Husk og kopier lenken så kan du komme tilbake til chatten.
+            <br>
+            <button class="copy-btn" onclick="copyLink()">📋 KOPIER LINK</button>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chatBox"></div>
+    <div style="padding:20px; display:flex; gap:10px; border-top:1px solid #eee;">
+        <input type="text" id="msgInp" placeholder="Skriv en melding..." class="input-box" style="margin:0;">
+        <button onclick="sendChat()" style="background:var(--p); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">Send</button>
+    </div>
+</div>
+
+<script>
+    const DB_URL = "https://infiniteshop-98f69-default-rtdb.europe-west1.firebasedatabase.app";
+    const WEBHOOK = "https://discord.com/api/webhooks/1467952378144624681/eYXQSuHoHn9MBFcA4FsaANkSjgbJ2ncNoOICyY3uMoxXbYl0mIrqyqvqvimd0eIhAsfO";
+
+    const items = [
+        { id: 1, n: "Diamond Helmet", p: 21, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Helmet.png" },
+        { id: 2, n: "Diamond Chestplate", p: 38, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Chestplate.png" },
+        { id: 3, n: "Diamond Leggings", p: 28, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Leggings.png" },
+        { id: 4, n: "Diamond Boots", p: 16, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Boots.png" },
+        { id: 5, n: "Netherite Upgrade", p: 108, c: "Diamonds", s: "lager", img: "https://minecraft.wiki/images/Invicon_Netherite_Upgrade.png" },
+        { id: 6, n: "Totem of Undying", p: 48, c: "Diamonds", s: "utsolgt", img: "https://minecraft.wiki/images/Invicon_Totem_of_Undying.png" },
+        { id: 7, n: "Netherite Ingot", p: 70, c: "Diamonds", s: "lager", img: "https://minecraft.wiki/images/Invicon_Netherite_Ingot.png" },
+        { id: 8, n: "Iron Sword", p: 32, c: "Coal", s: "lager", img: "https://minecraft.wiki/images/Invicon_Iron_Sword.png" },
+        { id: 9, n: "Diamond Sword", p: 45, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Sword.png" },
+        { id: 10, n: "Mystery Box", p: 50, c: "Iron", s: "lager", img: "https://raw.githubusercontent.com/mathworkproject/image/refs/heads/main/Chest.png" },
+        { id: 11, n: "Diamond Pickaxe", p: 45, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Pickaxe.png" },
+        { id: 12, n: "Iron Pickaxe", p: 25, c: "Coal", s: "lager", img: "https://minecraft.wiki/images/Invicon_Iron_Pickaxe.png" },
+        { id: 13, n: "Diamond Axe", p: 38, c: "Iron", s: "lager", img: "https://minecraft.wiki/images/Invicon_Diamond_Axe.png" },
+        { id: 14, n: "Iron Axe", p: 17, c: "Coal", s: "lager", img: "https://minecraft.wiki/images/Invicon_Iron_Axe.png" },
+        { id: 15, n: "Potato", p: 1, c: "Coal", s: "lager", img: "https://minecraft.wiki/images/Invicon_Potato.png" },
+        { id: 16, n: "Carrots", p: 1, c: "Coal", s: "lager", img: "https://minecraft.wiki/images/Invicon_Carrot.png" },
+        { id: 17, n: "Cooked Mutton", p: 3, c: "Coal", s: "lager", img: "https://minecraft.wiki/images/Invicon_Cooked_Mutton.png" }
+    ];
+
+    let cart = {};
+
+    function initProducts() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = items.map(p => {
+            const isOut = p.s === "utsolgt";
+            return `<div class="card" style="${isOut ? 'opacity: 0.6;' : ''}">
+                <span class="status-badge" style="color: ${isOut ? 'var(--out)' : 'var(--s)'}">${isOut ? '● Utsolgt' : '● På lager'}</span>
+                <img src="${p.img}" alt="${p.n}">
+                <h3>${p.n}</h3>
+                <p style="color:#64748b; font-weight:600;">${p.p} ${p.c}</p>
+                <button class="buy-btn" onclick="addToCart(${p.id})" ${isOut ? 'disabled' : ''}>${isOut ? 'Utsolgt' : 'Legg i kurv'}</button>
+            </div>`;
+        }).join('');
+    }
+
+    function addToCart(id) {
+        cart[id] = (cart[id] || 0) + 1;
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        let count = 0, html = "";
+        let totals = {};
+        for (let id in cart) {
+            count += cart[id];
+            const item = items.find(i => i.id == id);
+            totals[item.c] = (totals[item.c] || 0) + (item.p * cart[id]);
+            html += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;">
+                <span>${cart[id]}x ${item.n}</span>
+                <button onclick="delete cart[${id}];updateCartUI()" style="border:none; color:red; background:none; cursor:pointer;">Fjern</button>
+            </div>`;
+        }
+        const totalString = Object.keys(totals).length > 0 ? Object.entries(totals).map(([cur, val]) => `${val} ${cur}`).join(" + ") : "Handlekurven er tom";
+        document.getElementById('cartCount').innerText = count;
+        document.getElementById('cartItems').innerHTML = html || "Kurven er tom";
+        document.getElementById('totalDisplay').innerText = "Total: " + totalString;
+    }
+
+    async function placeOrder() {
+        const name = document.getElementById('mcName').value;
+        const pass = document.getElementById('orderPass').value;
+        const totalText = document.getElementById('totalDisplay').innerText;
+        if(!name || !pass || Object.keys(cart).length === 0) return alert("Fyll ut alt!");
+        const orderId = "ORD-" + Math.floor(Math.random() * 9000);
+        const orderList = Object.keys(cart).map(id => `${cart[id]}x ${items.find(i => i.id == id).n}`).join(", ");
+        try {
+            await fetch(`${DB_URL}/orders/${orderId}.json`, { method: 'PUT', body: JSON.stringify({ user: name, pass: pass, items: orderList, total: totalText, status: "pending", time: new Date().toLocaleString() }) });
+            await fetch(WEBHOOK, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ embeds: [{ title: "🛒 Ny Ordre!", color: 6513905, fields: [{ name: "Bruker", value: name, inline: true }, { name: "ID", value: orderId, inline: true }, { name: "Varer", value: orderList }, { name: "Pris", value: totalText }] }] }) });
+            alert("Ordre sendt!");
+            window.location.search = `?ordre=${orderId}`;
+        } catch(e) { alert("Feil ved sending."); }
+    }
+
+    function toggleCart() {
+        const p = document.getElementById('cart-panel');
+        p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Link kopiert til utklippstavlen!");
+    }
+
+    async function checkURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('ordre');
+        if(!orderId) return;
+        const res = await fetch(`${DB_URL}/orders/${orderId}.json`);
+        const data = await res.json();
+        if(!data) return;
+        const p = prompt("Passord for " + orderId + ":");
+        if(p === data.pass) openChat(orderId);
+    }
+
+    function openChat(id) {
+        document.getElementById('shop-page').style.display = 'none';
+        document.getElementById('chat-page').style.display = 'flex';
+        document.getElementById('chatTitle').innerText = "Ordre Chat: " + id;
+        
+        setInterval(async () => {
+            const res = await fetch(`${DB_URL}/orders/${id}.json`);
+            const data = await res.json();
+            if (data === null) { location.href = location.pathname; return; }
+            
+            // SYSTEMMELDING SOM ALLTID VISES ØVERST
+            let chatHtml = `<div class="msg a-msg" style="border-left: 4px solid var(--s);">
+                <strong>System:</strong><br>Vennligst vent til en selger kommer online for å hjelpe deg.
+            </div>`;
+            
+            if(data.messages) {
+                chatHtml += Object.values(data.messages).map(m => `<div class="msg ${m.role === 'user' ? 'u-msg' : 'a-msg'}"><strong>${m.role === 'user' ? 'Deg' : 'Selger'}:</strong><br>${m.text}</div>`).join('');
+            }
+            
+            document.getElementById('chatBox').innerHTML = chatHtml;
+            const cb = document.getElementById('chatBox');
+            cb.scrollTop = cb.scrollHeight;
+        }, 3000);
+    }
+
+    async function sendChat() {
+        const inp = document.getElementById('msgInp');
+        const id = new URLSearchParams(window.location.search).get('ordre');
+        if(!inp.value || !id) return;
+        await fetch(`${DB_URL}/orders/${id}/messages.json`, { method: 'POST', body: JSON.stringify({ role: 'user', text: inp.value }) });
+        inp.value = "";
+    }
+
+    window.onload = () => { initProducts(); checkURL(); };
+</script>
+</body>
+</html>
