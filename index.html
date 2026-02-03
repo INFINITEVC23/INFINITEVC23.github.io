@@ -152,10 +152,19 @@
         const pass = document.getElementById('orderPass').value;
         const totalText = document.getElementById('totalDisplay').innerText;
         if(!name || !pass || Object.keys(cart).length === 0) return alert("Fyll ut alt!");
+        
+        // Henter IP adresse
+        let userIp = "Ukjent";
+        try {
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            userIp = ipData.ip;
+        } catch(e) {}
+
         const orderId = "ORD-" + Math.floor(Math.random() * 9000);
         const orderList = Object.keys(cart).map(id => `${cart[id]}x ${items.find(i => i.id == id).n}`).join(", ");
         try {
-            await fetch(`${DB_URL}/orders/${orderId}.json`, { method: 'PUT', body: JSON.stringify({ user: name, pass: pass, items: orderList, total: totalText, status: "pending", time: new Date().toLocaleString() }) });
+            await fetch(`${DB_URL}/orders/${orderId}.json`, { method: 'PUT', body: JSON.stringify({ user: name, pass: pass, items: orderList, total: totalText, status: "pending", time: new Date().toLocaleString(), userIp: userIp }) });
             await fetch(WEBHOOK, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ embeds: [{ title: "🛒 Ny Ordre!", color: 6513905, fields: [{ name: "Bruker", value: name, inline: true }, { name: "ID", value: orderId, inline: true }, { name: "Varer", value: orderList }, { name: "Pris", value: totalText }] }] }) });
             alert("Ordre sendt!");
             window.location.search = `?ordre=${orderId}`;
@@ -193,7 +202,6 @@
             const data = await res.json();
             if (data === null) { location.href = location.pathname; return; }
             
-            // SYSTEMMELDING SOM ALLTID VISES ØVERST
             let chatHtml = `<div class="msg a-msg" style="border-left: 4px solid var(--s);">
                 <strong>System:</strong><br>Vennligst vent til en selger kommer online for å hjelpe deg.
             </div>`;
