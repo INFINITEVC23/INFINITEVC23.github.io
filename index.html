@@ -1,49 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NX-STRIKE | Ghost Shield</title>
+    <title>NX-STRIKE | Ghost Shield V7</title>
     <style>
         body { background: #020202; color: #00ff00; font-family: 'Consolas', monospace; padding: 30px; text-align: center; }
-        .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; }
-        textarea { width: 100%; height: 280px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; }
-        .btn { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; }
-        .btn:hover { background: #00cc00; box-shadow: 0 0 20px #00ff0066; }
+        .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
+        .config-box { margin-bottom: 20px; text-align: left; border: 1px solid #222; padding: 15px; }
+        label { display: block; font-size: 10px; color: #666; margin-bottom: 5px; letter-spacing: 2px; }
+        input[type="text"] { width: 100%; background: #000; border: 1px solid #00ff0044; color: #fff; padding: 10px; font-family: monospace; outline: none; box-sizing: border-box; }
+        textarea { width: 100%; height: 200px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; box-sizing: border-box; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; transition: 0.3s; }
+        .btn:hover { background: #fff; box-shadow: 0 0 20px #00ff00; }
+        .status { font-size: 10px; color: #444; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="letter-spacing: 10px;">NX-STRIKE V5</h1>
-    <p style="color:#444; font-size:10px;">GHOST PROTOCOL | NO-PCALL | NO-BIT32</p>
+    <h1 style="letter-spacing: 10px; margin-bottom: 5px;">NX-STRIKE V7</h1>
+    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.6;">ANTI-TAMPER | WEBHOOK SNITCH | GHOST BYTECODE</p>
     
-    <textarea id="input" placeholder="[ INPUT RAW SOURCE ]"></textarea>
-    <button class="btn" onclick="strike()">GENERATE GHOST BYTECODE</button>
-    <textarea id="output" readonly placeholder="[ ENCRYPTED OUTPUT ]"></textarea>
+    <div class="config-box">
+        <label>DISCORD PROXY WEBHOOK (Use hooks.hyra.io or similar)</label>
+        <input type="text" id="webhook" placeholder="https://webhook.lewisakura.moe/api/webhooks/...">
+    </div>
+
+    <textarea id="input" placeholder="[ PASTE RAW SOURCE CODE HERE ]"></textarea>
+    
+    <button class="btn" onclick="strike()">STRIKE & PROTECT</button>
+    
+    <div style="margin-top: 25px;">
+        <label>ENCRYPTED GHOST OUTPUT</label>
+        <textarea id="output" readonly placeholder="[ SECURED OUTPUT WILL APPEAR HERE ]"></textarea>
+    </div>
+    
+    <p class="status">SYSTEM READY | ENCRYPTION: MANUAL XOR + SHIFT</p>
 </div>
 
 <script>
 function strike() {
     const src = document.getElementById('input').value;
-    if(!src) return;
+    const webhookUrl = document.getElementById('webhook').value || "NONE";
+    
+    if(!src) { alert("Input required."); return; }
 
-    // Static keys for this session
+    // --- STAGE 1: INJECT ANTI-TAMPER ---
+    // This logic is added to your script BEFORE it is turned into numbers.
+    const antiTamper = `
+local _H = game:GetService("HttpService")
+local _P = game.Players.LocalPlayer
+local function _SNITCH(_r)
+    local _payload = {["embeds"] = {{["title"] = "🚨 ANTI-TAMPER TRIGGERED", ["color"] = 16711680, ["fields"] = {
+        {["name"] = "User", ["value"] = _P.Name.." (".._P.UserId..")", ["inline"] = true},
+        {["name"] = "Reason", ["value"] = _r, ["inline"] = true},
+        {["name"] = "Game", ["value"] = "https://www.roblox.com/games/"..game.PlaceId}
+    }}}}
+    pcall(function() _H:PostAsync("${webhookUrl}", _H:JSONEncode(_payload)) end)
+    task.wait(0.5)
+    _P:Kick("\\n[NX-STRIKE SECURITY]\\nAnti-Tamper detected.\\nInformation logged.")
+end
+if tostring(loadstring):find("function") then _SNITCH("Hooked loadstring (Dumping Attempt)") end
+`;
+
+    const fullCode = antiTamper + "\n" + src;
+
+    // --- STAGE 2: ENCRYPTION ---
     const key = Math.floor(Math.random() * 200) + 20;
     const shift = Math.floor(Math.random() * 50) + 5;
 
     let bytes = [];
-    for (let i = 0; i < src.length; i++) {
-        // Multi-stage encryption without using bitwise in JS for compatibility
-        let b = src.charCodeAt(i);
+    for (let i = 0; i < fullCode.length; i++) {
+        let b = fullCode.charCodeAt(i);
+        // Custom math sequence: byte + shift XOR key
         bytes.push(b + shift ^ key);
     }
 
-    const loader = `--[[ NX-STRIKE GHOST LOADER ]]
+    // --- STAGE 3: LOADER GENERATION ---
+    const loader = `--[[ NX-STRIKE GHOST LOADER V7 ]]
 local _k = ${key}
 local _s = ${shift}
 local _d = {${bytes.join(',')}}
 local _r = {}
 
--- Manual XOR Logic (Bypasses bit32 detection)
 local function _x(a, b)
     local r, p = 0, 1
     while a > 0 or b > 0 do
@@ -55,16 +93,11 @@ local function _x(a, b)
 end
 
 for i = 1, #_d do
-    -- Destructure and reconstruct
     _r[i] = string.char(_x(_d[i], _k) - _s)
 end
 
 local _f = loadstring(table.concat(_r))
-
--- Memory Purge
-_d, _r, _x = nil, nil, nil
-
--- Direct Execution (No pcall signature)
+_d, _r, _x, _k, _s = nil, nil, nil, nil -- Wipe Evidence
 _f()`;
 
     document.getElementById('output').value = loader;
