@@ -1,1 +1,81 @@
-Nettside er stengt.
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NX-Ultra | Advanced Lua Shield</title>
+    <style>
+        body { background: #0a0a0c; color: #cfcfcf; font-family: 'Consolas', monospace; padding: 40px; }
+        .box { max-width: 900px; margin: auto; background: #121218; border: 1px solid #00ffaa33; padding: 25px; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 255, 170, 0.1); }
+        textarea { width: 100%; height: 250px; background: #050507; color: #00ffaa; border: 1px solid #222; padding: 15px; border-radius: 6px; font-size: 13px; margin-top: 10px; }
+        .btn { background: #00ffaa; color: #000; border: none; padding: 15px 30px; border-radius: 6px; font-weight: 800; cursor: pointer; width: 100%; margin: 15px 0; font-size: 16px; text-transform: uppercase; }
+        h1 { color: #00ffaa; text-align: center; font-size: 24px; letter-spacing: 2px; }
+        .status { font-size: 12px; color: #555; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>NX-ULTRA V2</h1>
+    <p style="text-align:center; font-size: 12px;">POLYMORPHIC LUA VIRTUALIZATION</p>
+    
+    <textarea id="in" placeholder="-- SOURCE CODE HERE"></textarea>
+    <button class="btn" onclick="build()">Generate Shielded Bytecode</button>
+    <textarea id="out" readonly placeholder="-- PROTECTED OUTPUT"></textarea>
+    
+    <div class="status">
+        [Protection: XOR-Chaining, Dynamic Junk, String-Hiding]
+    </div>
+</div>
+
+<script>
+function build() {
+    const code = document.getElementById('in').value;
+    if(!code) return;
+
+    // 1. Generate Multiple Random Keys
+    const key1 = Math.floor(Math.random() * 128) + 50;
+    const key2 = Math.floor(Math.random() * 128) + 20;
+    
+    // 2. Multi-Layer Encryption
+    let bytes = [];
+    for (let i = 0; i < code.length; i++) {
+        let b = code.charCodeAt(i);
+        b = b ^ key1; // Layer 1
+        b = b + key2; // Layer 2
+        bytes.push(b);
+    }
+
+    // 3. Generate "Junk" Variables to confuse De-obfuscators
+    const junkName = () => "llIIl_" + Math.random().toString(36).substring(7);
+    const junkVar = `local ${junkName()} = ${Math.random() * 1000}`;
+
+    // 4. Advanced Loader with Junk Logic
+    const output = `--[[ PROTECTED BY NX-ULTRA ]]
+local _j1 = ${Math.random() * 9999}
+local _k1 = ${key1}
+local _k2 = ${key2}
+${junkVar}
+local _dat = {${bytes.join(',')}}
+local _raw = ""
+${junkVar}
+for i = 1, #_dat do
+    local b = _dat[i]
+    b = b - _k2
+    _raw = _raw .. string.char(bit32.bxor(b, _k1))
+    if i % 100 == 0 then _j1 = _j1 + i end -- Junk math to slow down dumpers
+end
+${junkVar}
+local _exec, _fail = loadstring(_raw)
+if _exec then
+    task.spawn(function()
+        _exec()
+    end)
+else
+    error("Critical Runtime Violation: " .. _fail)
+end`;
+
+    document.getElementById('out').value = output;
+}
+</script>
+
+</body>
+</html>
