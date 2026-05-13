@@ -1,88 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NX-VOID | Virtualization Shield</title>
+    <title>NX-STRIKE | Ghost Shield</title>
     <style>
-        body { background: #050505; color: #ff0055; font-family: 'Courier New', monospace; padding: 20px; }
-        .main { max-width: 900px; margin: auto; background: #0a0a0f; border: 1px solid #ff0055; padding: 30px; border-radius: 5px; box-shadow: 0 0 40px #ff005522; }
-        textarea { width: 100%; height: 280px; background: #000; color: #ff0055; border: 1px solid #ff005533; padding: 15px; font-size: 11px; margin-bottom: 15px; outline: none; }
-        .btn { background: #ff0055; color: #fff; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 3px; }
-        .btn:hover { background: #ff3377; box-shadow: 0 0 15px #ff0055; }
-        h1 { text-align: center; font-size: 28px; text-shadow: 0 0 10px #ff0055; }
+        body { background: #020202; color: #00ff00; font-family: 'Consolas', monospace; padding: 30px; text-align: center; }
+        .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; }
+        textarea { width: 100%; height: 280px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; }
+        .btn:hover { background: #00cc00; box-shadow: 0 0 20px #00ff0066; }
     </style>
 </head>
 <body>
 
-<div class="main">
-    <h1>NX-VOID V4</h1>
-    <p style="color:#666; text-align:center;">ADVANCED VIRTUAL MACHINE OBFUSCATION</p>
+<div class="container">
+    <h1 style="letter-spacing: 10px;">NX-STRIKE V5</h1>
+    <p style="color:#444; font-size:10px;">GHOST PROTOCOL | NO-PCALL | NO-BIT32</p>
     
-    <textarea id="src" placeholder="-- INPUT SOURCE CODE"></textarea>
-    <button class="btn" onclick="void_protect()">INITIALIZE VOID PROTOCOL</button>
-    <textarea id="res" readonly placeholder="-- PROTECTED BYTECODE"></textarea>
+    <textarea id="input" placeholder="[ INPUT RAW SOURCE ]"></textarea>
+    <button class="btn" onclick="strike()">GENERATE GHOST BYTECODE</button>
+    <textarea id="output" readonly placeholder="[ ENCRYPTED OUTPUT ]"></textarea>
 </div>
 
 <script>
-function void_protect() {
-    const src = document.getElementById('src').value;
+function strike() {
+    const src = document.getElementById('input').value;
     if(!src) return;
 
-    // 1. Create a random "Opcode" map to confuse de-compilers
-    const seed = Math.floor(Math.random() * 999) + 100;
-    const key = Math.floor(Math.random() * 254) + 1;
+    // Static keys for this session
+    const key = Math.floor(Math.random() * 200) + 20;
+    const shift = Math.floor(Math.random() * 50) + 5;
 
     let bytes = [];
     for (let i = 0; i < src.length; i++) {
-        // Double-XOR layer with a shifting seed
+        // Multi-stage encryption without using bitwise in JS for compatibility
         let b = src.charCodeAt(i);
-        let transformed = (b ^ key) ^ (seed % 255);
-        bytes.push(transformed);
+        bytes.push(b + shift ^ key);
     }
 
-    // 2. The "NX-VOID" Virtual Machine Loader
-    const loader = `--[[ NX-VOID V4 - ANTI-TAMPER ACTIVE ]]
-local _v = tonumber
-local _s = string.char
-local _t = table.concat
-local _m = math.floor
+    const loader = `--[[ NX-STRIKE GHOST LOADER ]]
+local _k = ${key}
+local _s = ${shift}
+local _d = {${bytes.join(',')}}
+local _r = {}
 
-local function _decode(_data, _k, _sd)
-    local _out = {}
-    local _ptr = 1
-    
-    -- Control Flow Flattening Simulation
-    while _ptr <= #_data do
-        local _byte = _data[_ptr]
-        local _step1 = bit32.bxor(_byte, (_sd % 255))
-        local _step2 = bit32.bxor(_step1, _k)
-        
-        _out[_ptr] = _s(_step2)
-        _ptr = _ptr + 1
-        
-        -- Junk calculations to confuse debuggers
-        if _ptr % 50 == 0 then
-            local _junk = _m(_sd / _ptr) + _k
-        end
+-- Manual XOR Logic (Bypasses bit32 detection)
+local function _x(a, b)
+    local r, p = 0, 1
+    while a > 0 or b > 0 do
+        local ra, rb = a % 2, b % 2
+        if ra ~= rb then r = r + p end
+        a, b, p = math.floor(a / 2), math.floor(b / 2), p * 2
     end
-    return _t(_out)
+    return r
 end
 
-local _vm_data = {${bytes.join(',')}}
-local _vm_exec = loadstring(_decode(_vm_data, ${key}, ${seed}))
+for i = 1, #_d do
+    -- Destructure and reconstruct
+    _r[i] = string.char(_x(_d[i], _k) - _s)
+end
 
--- Memory Isolation
-_vm_data = nil
-_decode = nil
+local _f = loadstring(table.concat(_r))
 
-local _success, _err = pcall(function()
-    return _vm_exec()
-end)
+-- Memory Purge
+_d, _r, _x = nil, nil, nil
 
-if not _success then
-    warn("VOID_CRITICAL_FAILURE: " .. tostring(_err))
-end`;
+-- Direct Execution (No pcall signature)
+_f()`;
 
-    document.getElementById('res').value = loader;
+    document.getElementById('output').value = loader;
 }
 </script>
 
