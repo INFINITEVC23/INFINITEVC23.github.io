@@ -1,86 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NX-STRIKE | Ghost Shield V7</title>
+    <title>NX-STRIKE | Ghost Shield V7 PRO</title>
     <style>
         body { background: #020202; color: #00ff00; font-family: 'Consolas', monospace; padding: 30px; text-align: center; }
-        .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
-        .config-box { margin-bottom: 20px; text-align: left; border: 1px solid #222; padding: 15px; }
-        label { display: block; font-size: 10px; color: #666; margin-bottom: 5px; letter-spacing: 2px; }
-        input[type="text"] { width: 100%; background: #000; border: 1px solid #00ff0044; color: #fff; padding: 10px; font-family: monospace; outline: none; box-sizing: border-box; }
-        textarea { width: 100%; height: 200px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; box-sizing: border-box; }
-        .btn { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; transition: 0.3s; }
-        .btn:hover { background: #fff; box-shadow: 0 0 20px #00ff00; }
-        .status { font-size: 10px; color: #444; margin-top: 10px; }
+        .container { max-width: 900px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; box-shadow: 0 0 40px rgba(0, 255, 0, 0.2); }
+        .config-box { margin-bottom: 20px; text-align: left; border: 1px solid #111; padding: 15px; background: #080808; }
+        label { display: block; font-size: 10px; color: #00ff00; margin-bottom: 5px; letter-spacing: 2px; text-transform: uppercase; }
+        input[type="text"] { width: 100%; background: #000; border: 1px solid #00ff0044; color: #fff; padding: 12px; font-family: monospace; outline: none; box-sizing: border-box; transition: 0.3s; }
+        input[type="text"]:focus { border-color: #00ff00; box-shadow: 0 0 10px #00ff0033; }
+        textarea { width: 100%; height: 250px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; box-sizing: border-box; resize: vertical; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 20px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; transition: 0.3s; text-transform: uppercase; }
+        .btn:hover { background: #fff; box-shadow: 0 0 30px #00ff00; transform: scale(1.01); }
+        .status { font-size: 10px; color: #333; margin-top: 15px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="letter-spacing: 10px; margin-bottom: 5px;">NX-STRIKE V7</h1>
-    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.6;">ANTI-TAMPER | WEBHOOK SNITCH | GHOST BYTECODE</p>
+    <h1 style="letter-spacing: 15px; margin-bottom: 5px; text-shadow: 0 0 10px #00ff00;">NX-STRIKE V7</h1>
+    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.8;">VIRTUAL MACHINE | HARDENED ANTI-TAMPER | HWID SNITCH</p>
     
     <div class="config-box">
-        <label>DISCORD PROXY WEBHOOK (Use hooks.hyra.io or similar)</label>
-        <input type="text" id="webhook" placeholder="https://webhook.lewisakura.moe/api/webhooks/...">
+        <label>Proxy Webhook (e.g., hooks.hyra.io)</label>
+        <input type="text" id="webhook" placeholder="PASTE PROXY WEBHOOK HERE">
     </div>
 
-    <textarea id="input" placeholder="[ PASTE RAW SOURCE CODE HERE ]"></textarea>
+    <textarea id="input" placeholder="-- PASTE YOUR RAW SOURCE CODE HERE --"></textarea>
     
-    <button class="btn" onclick="strike()">STRIKE & PROTECT</button>
+    <button class="btn" onclick="strike()">GENERATE GHOST SHIELD</button>
     
     <div style="margin-top: 25px;">
-        <label>ENCRYPTED GHOST OUTPUT</label>
-        <textarea id="output" readonly placeholder="[ SECURED OUTPUT WILL APPEAR HERE ]"></textarea>
+        <label>GHOST OUTPUT (ENCRYPTED VM)</label>
+        <textarea id="output" readonly placeholder="[ ENCRYPTED SCRIPT WILL LOAD HERE ]"></textarea>
     </div>
     
-    <p class="status">SYSTEM READY | ENCRYPTION: MANUAL XOR + SHIFT</p>
+    <p class="status">STATUS: SYSTEM ENCRYPTED // NO-PCALL MODE ACTIVE // HWID-LOGGER: ON</p>
 </div>
 
 <script>
 function strike() {
     const src = document.getElementById('input').value;
-    const webhookUrl = document.getElementById('webhook').value || "NONE";
+    const webhookUrl = document.getElementById('webhook').value;
     
     if(!src) { alert("Input required."); return; }
+    if(!webhookUrl) { alert("A Webhook is required for the Snitch system."); return; }
 
-    // --- STAGE 1: INJECT ANTI-TAMPER ---
-    // This logic is added to your script BEFORE it is turned into numbers.
+    // --- STAGE 1: HARDENED ANTI-TAMPER + SNITCH ---
     const antiTamper = `
 local _H = game:GetService("HttpService")
 local _P = game.Players.LocalPlayer
-local function _SNITCH(_r)
-    local _payload = {["embeds"] = {{["title"] = "🚨 ANTI-TAMPER TRIGGERED", ["color"] = 16711680, ["fields"] = {
-        {["name"] = "User", ["value"] = _P.Name.." (".._P.UserId..")", ["inline"] = true},
-        {["name"] = "Reason", ["value"] = _r, ["inline"] = true},
-        {["name"] = "Game", ["value"] = "https://www.roblox.com/games/"..game.PlaceId}
-    }}}}
-    pcall(function() _H:PostAsync("${webhookUrl}", _H:JSONEncode(_payload)) end)
+local _A = game:GetService("RbxAnalyticsService")
+
+local function _SNITCH(_reason)
+    local _data = {
+        ["content"] = "@everyone 🚨 **NX-STRIKE BREACH**",
+        ["embeds"] = {{
+            ["title"] = "NX-STRIKE V7 SECURE LOG",
+            ["description"] = "Security violation detected in internal VM.",
+            ["color"] = 0xff0000,
+            ["fields"] = {
+                {["name"] = "User", ["value"] = _P.Name.." (".._P.UserId..")", ["inline"] = true},
+                {["name"] = "HWID", ["value"] = "||".._A:GetClientId().."||", ["inline"] = true},
+                {["name"] = "Reason", ["value"] = "Attempted to: ".._reason, ["inline"] = false},
+                {["name"] = "JobId", ["value"] = game.JobId, ["inline"] = false}
+            },
+            ["footer"] = {["text"] = "NX-STRIKE GHOST SHIELD V7"}
+        }}
+    }
+    _H:PostAsync("${webhookUrl}", _H:JSONEncode(_data))
     task.wait(0.5)
-    _P:Kick("\\n[NX-STRIKE SECURITY]\\nAnti-Tamper detected.\\nInformation logged.")
+    _P:Kick("\\n[NX-STRIKE]\\nSecurity Breach: ".._reason.."\\nInformation logged.")
 end
-if tostring(loadstring):find("function") then _SNITCH("Hooked loadstring (Dumping Attempt)") end
+
+-- Detect print/warn/error hooking
+if tostring(print) ~= "function: builtin#print" or debug.getinfo(print).name ~= "print" then
+    _SNITCH("Hook print() for dumping")
+end
+
+-- Detect Metatable manipulation (Dex/Explorer)
+if getrawmetatable and getrawmetatable(game).__index ~= nil then
+    _SNITCH("Manipulate Game Metatable")
+end
 `;
 
     const fullCode = antiTamper + "\n" + src;
 
-    // --- STAGE 2: ENCRYPTION ---
-    const key = Math.floor(Math.random() * 200) + 20;
-    const shift = Math.floor(Math.random() * 50) + 5;
-
-    let bytes = [];
-    for (let i = 0; i < fullCode.length; i++) {
-        let b = fullCode.charCodeAt(i);
-        // Custom math sequence: byte + shift XOR key
-        bytes.push(b + shift ^ key);
+    // --- STAGE 2: GHOST ENCRYPTION (XOR + BASE64 SHIFT) ---
+    const key = Math.floor(Math.random() * 150) + 50;
+    
+    function encode(str) {
+        return btoa(unescape(encodeURIComponent(str)));
     }
 
-    // --- STAGE 3: LOADER GENERATION ---
-    const loader = `--[[ NX-STRIKE GHOST LOADER V7 ]]
+    let b64 = encode(fullCode);
+    let bytes = [];
+    for (let i = 0; i < b64.length; i++) {
+        bytes.push(b64.charCodeAt(i) ^ key);
+    }
+
+    // --- STAGE 3: THE VM LOADER ---
+    const loader = `--[[ NX-STRIKE GHOST SHIELD V7 ]]
 local _k = ${key}
-local _s = ${shift}
-local _d = {${bytes.join(',')}}
-local _r = {}
+local _b = {${bytes.join(',')}}
+local _c = ""
 
 local function _x(a, b)
     local r, p = 0, 1
@@ -92,12 +115,28 @@ local function _x(a, b)
     return r
 end
 
-for i = 1, #_d do
-    _r[i] = string.char(_x(_d[i], _k) - _s)
+for i = 1, #_b do
+    _c = _c .. string.char(_x(_b[i], _k))
 end
 
-local _f = loadstring(table.concat(_r))
-_d, _r, _x, _k, _s = nil, nil, nil, nil -- Wipe Evidence
+-- Ghost VM Decoder
+local function _decode(data)
+    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    data = string.gsub(data, '[^'..b..'=]', '')
+    return (data:gsub('.', function(x)
+        if (x == '=') then return '' end
+        local r,f='',(b:find(x)-1)
+        for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1' or '0') end
+        return r;
+    end):gsub('%d%d%d%d%d%d%d%d', function(x)
+        local r=0
+        for i=1,8 do r=r+(x:sub(i,i)=='1' and 2^(8-i) or 0) end
+        return string.char(r)
+    end))
+end
+
+local _f = loadstring(_decode(_c))
+_k, _b, _c, _x, _decode = nil, nil, nil, nil, nil
 _f()`;
 
     document.getElementById('output').value = loader;
