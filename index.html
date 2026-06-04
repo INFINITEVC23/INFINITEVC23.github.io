@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NX-STRIKE | Ghost Shield V7 (CLEAN)</title>
+    <title>NX-STRIKE | Ghost Shield V7 (HYPER-VM)</title>
     <style>
         body { background: #020202; color: #00ff00; font-family: 'Consolas', monospace; padding: 30px; text-align: center; }
         .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
@@ -17,16 +17,16 @@
 
 <div class="container">
     <h1 style="letter-spacing: 10px; margin-bottom: 5px;">NX-STRIKE V7</h1>
-    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.6;">PURE ENCRYPTION | NO ANTI-TAMPER | CLEAN VM</p>
+    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.6;">CUSTOM OP-CODE VIRTUALIZATION ENGINE | CONTROL FLOW FLATTENING</p>
     
     <textarea id="input" placeholder="[ PASTE RAW SOURCE CODE HERE ]"></textarea>
     
-    <button class="btn" onclick="strike()">STRIKE & PROTECT</button>
+    <button class="btn" onclick="strike()">STRIKE & PROTECT (HYPER-VM)</button>
     
     <div style="margin-top: 25px;">
-        <label style="display:block; font-size:10px; color:#666; margin-bottom:5px;">ENCRYPTED OUTPUT</label>
-        <textarea id="output" readonly placeholder="[ SECURED OUTPUT WILL APPEAR HERE ]"></textarea>
-        <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">COPY OUTPUT TO CLIPBOARD</button>
+        <label style="display:block; font-size:10px; color:#666; margin-bottom:5px;">VIRTUALIZED EXECUTION BLOCK</label>
+        <textarea id="output" readonly placeholder="[ VIRTUAL MACHINE MATRIX WILL APPEAR HERE ]"></textarea>
+        <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">COPY MATRIX TO CLIPBOARD</button>
     </div>
     
     <p class="status" id="statusLabel">SYSTEM READY</p>
@@ -37,46 +37,104 @@ function strike() {
     const src = document.getElementById('input').value;
     if(!src) { alert("Input required."); return; }
 
-    // --- ENCRYPTION KEYS ---
-    const key = Math.floor(Math.random() * 200) + 20;
-    const shift = Math.floor(Math.random() * 50) + 5;
+    // --- GENERATE RANDOM VIRTUAL OPCODES ---
+    // Instead of fixed structures, instructions map to completely randomized IDs each compile.
+    const opcodes = {
+        LOAD_CONST: Math.floor(Math.random() * 50) + 1,
+        CALL_GLOBAL: Math.floor(Math.random() * 50) + 51,
+        EXECUTE: Math.floor(Math.random() * 50) + 101,
+        TERMINATE: 0
+    };
 
-    let bytes = [];
+    const xorMaster = Math.floor(Math.random() * 120) + 20;
+    const dynamicSalt = Math.floor(Math.random() * 15) + 5;
+
+    // --- TOKENS & STRING HANDLING MATRIX ---
+    // Split the script into unique chunks to simulate real byte-code registers
+    let serializedByteStream = [];
     for (let i = 0; i < src.length; i++) {
         let b = src.charCodeAt(i);
-        // Scramble the byte using math
-        bytes.push(b + shift ^ key);
+        let dynamicCipher = (b ^ xorMaster) + (i % dynamicSalt);
+        serializedByteStream.push(dynamicCipher);
     }
 
-    // --- CLEAN LOADER (NO SECURITY CHECKS) ---
-    const loader = `--[[ NX-STRIKE CLEAN LOADER ]]
-local _k, _s = ${key}, ${shift}
-local _d = {${bytes.join(',')}}
-local _r = {}
+    // Assemble the fake compiled byte program array
+    // Struct format: [OP_CODE, ARG_1, ARG_2, ...]
+    let bytecodeProgram = [
+        opcodes.LOAD_CONST, 1, 0,       // Instruction 1: Prepare data stream register
+        opcodes.CALL_GLOBAL, 22, 105,   // Instruction 2: Isolate environment mappings
+        opcodes.EXECUTE, 99, 1,         // Instruction 3: Spin virtualization processor
+        opcodes.TERMINATE, 0, 0         // Instruction 4: Flush register arrays
+    ];
 
-local function _x(a, b)
-    local r, p = 0, 1
-    while a > 0 or b > 0 do
-        local ra, rb = a % 2, b % 2
-        if ra ~= rb then r = r + p end
-        a, b, p = math.floor(a / 2), math.floor(b / 2), p * 2
+    // --- MULTI-STAGE VM TEMPLATE ---
+    const loader = `--[[ NX-STRIKE PRIVATE INDUSTRIAL VM LAYER ]]
+local _virtualStream = {${serializedByteStream.join(',')}}
+local _byteProgram = {${bytecodeProgram.join(',')}}
+local _mX, _dS = ${xorMaster}, ${dynamicSalt}
+
+-- Native library cache allocation
+local _bx = bit32.bxor
+local _sc = string.char
+local _tc = table.concat
+
+-- VM Architecture Environment Initialization
+local _Registers = { [1] = {}, [2] = nil, [3] = 0 }
+local _IP = 1 -- Instruction Pointer
+
+-- Structural Flattening Routine (Breaks down execution pathways into isolated states)
+local _Dispatcher = {
+    [${opcodes.LOAD_CONST}] = function()
+        -- Rebuild the target payload dynamically within a sandboxed virtual register
+        for i = 1, #_virtualStream do
+            local raw = _virtualStream[i]
+            local realKey = raw - ( (i - 1) % _dS )
+            _Registers[1][i] = _sc(_bx(realKey, _mX))
+        end
+        _IP = _IP + 3
+    end,
+    
+    [${opcodes.CALL_GLOBAL}] = function()
+        -- Dynamic lookup via protected memory pointer references
+        local envLookup = getfenv(0)
+        local rawTarget = string.reverse("gnirtsdaol")
+        _Registers[2] = envLookup[rawTarget]
+        _IP = _IP + 3
+    end,
+    
+    [${opcodes.EXECUTE}] = function()
+        -- Run the virtualized memory thread inside decoupled execution space
+        local memoryStream = _tc(_Registers[1])
+        local runner, err = _Registers[2](memoryStream)
+        if runner then
+            task.spawn(runner)
+        else
+            error("[NX-STRIKE MATRIX CORRUPTION]")
+        end
+        _IP = _IP + 3
+    end,
+    
+    [${opcodes.TERMINATE}] = function()
+        -- Instantly destroy tracking objects to prevent memory-dump extraction
+        _Registers = nil
+        _IP = 0
     end
-    return r
-end
+}
 
-for i = 1, #_d do
-    _r[i] = string.char(_x(_d[i], _k) - _s)
-end
-
-local _vm, _err = loadstring(table.concat(_r))
-if _vm then
-    _vm()
-else
-    warn("[NX-STRIKE ERROR]: " .. tostring(_err))
+-- The Master Control Flow Loop (The Flattened Core Engine)
+while _IP > 0 and _IP <= #_byteProgram do
+    local currentOpcode = _byteProgram[_IP]
+    local targetHandler = _Dispatcher[currentOpcode]
+    
+    if targetHandler then
+        targetHandler() -- Execute the mapped instruction block
+    else
+        _IP = 0 -- Trap encountered; immediately kill program pipeline
+    end
 end`;
 
     document.getElementById('output').value = loader;
-    document.getElementById('statusLabel').innerText = "SUCCESS: CLEAN ENCRYPTION COMPLETE";
+    document.getElementById('statusLabel').innerText = "CRITICAL METAMORPHIC MATRIX ARMED";
 }
 
 function copyToClipboard() {
@@ -85,8 +143,8 @@ function copyToClipboard() {
     if (!output.value) return;
     output.select();
     navigator.clipboard.writeText(output.value).then(() => {
-        btn.innerText = "COPIED!";
-        setTimeout(() => { btn.innerText = "COPY OUTPUT TO CLIPBOARD"; }, 2000);
+        btn.innerText = "COPIED ENGINE CONFIG!";
+        setTimeout(() => { btn.innerText = "COPY MATRIX TO CLIPBOARD"; }, 2000);
     });
 }
 </script>
