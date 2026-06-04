@@ -1,205 +1,307 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NX-STRIKE | Ghost Shield V14 (BYTECODE MATRIX)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genuine Luau Virtual Machine Dev-Suite</title>
     <style>
-        body { background: #020202; color: #00ff00; font-family: 'Consolas', monospace; padding: 30px; text-align: center; }
-        .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
-        textarea { width: 100%; height: 200px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; box-sizing: border-box; }
-        .btn { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; transition: 0.3s; margin-bottom: 10px; }
-        .btn:hover { background: #fff; box-shadow: 0 0 20px #00ff00; }
-        .copy-btn { background: #111; color: #00ff00; border: 1px solid #00ff00; padding: 10px; width: 100%; font-size: 10px; letter-spacing: 2px; cursor: pointer; transition: 0.2s; }
-        .copy-btn:hover { background: #00ff00; color: #000; }
-        .status { font-size: 10px; color: #444; margin-top: 10px; }
+        :root {
+            --bg-primary: #0f111a;
+            --bg-secondary: #151824;
+            --accent: #ff5370;
+            --text-main: #a6accd;
+            --text-bright: #ffffff;
+            --code-green: #c3e88d;
+            --code-yellow: #ffcb6b;
+            --code-blue: #82aaff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--bg-secondary);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--text-bright);
+            margin-bottom: 5px;
+        }
+
+        .badge {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            color: var(--text-bright);
+            font-size: 1.2rem;
+            margin-top: 0;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        pre {
+            background-color: var(--bg-primary);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .pane-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Syntax Highlighting */
+        .comment { color: #546e7a; font-style: italic; }
+        .keyword { color: #c792ea; }
+        .string { color: var(--code-green); }
+        .number { color: #f78c6c; }
+        .builtin { color: var(--code-blue); }
+        .op { color: #89ddff; }
+
+        .btn {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        #terminal {
+            background-color: #05070f;
+            color: #f8f8f2;
+            font-family: 'Consolas', monospace;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-left: 3px solid var(--code-green);
+        }
+
+        .terminal-line { margin: 4px 0; }
+        .system-tag { color: var(--code-yellow); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="letter-spacing: 10px; margin-bottom: 5px;">NX-STRIKE V14</h1>
-    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.6;">CUSTOM LUA BYTECODE COMPILER | NON-XOR POSITION SHIFT | 400+ LINES</p>
-    
-    <textarea id="input" placeholder="[ PASTE RAW SOURCE CODE HERE ]"></textarea>
-    
-    <button class="btn" onclick="strike()">STRIKE & PROTECT (BYTECODE VM)</button>
-    
-    <div style="margin-top: 25px;">
-        <label style="display:block; font-size:10px; color:#666; margin-bottom:5px;">VIRTUALIZED STRUCTURAL RUNTIME</label>
-        <textarea id="output" readonly placeholder="[ CUSTOM BYTECODE SYSTEM READY ]"></textarea>
-        <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">COPY MATRIX TO CLIPBOARD</button>
+    <header>
+        <h1>Secure VM Architecture V14</h1>
+        <span class="badge">Pure Virtualization (No Loadstring)</span>
+    </header>
+
+    <div class="grid">
+        <!-- Panel 1: Original Code -->
+        <div class="panel">
+            <h2>1. Original Developer Intention</h2>
+            <p>This is the high-level code before compilation. Notice how variables exist as strings and paths are linear.</p>
+            <pre>
+<span class="keyword">local</span> message <span class="op">=</span> <span class="string">"Hello from a real VM!"</span>
+<span class="keyword">local</span> year <span class="op">=</span> <span class="number">2026</span>
+
+<span class="builtin">print</span>(message)
+<span class="builtin">print</span>(year)
+            </pre>
+        </div>
+
+        <!-- Panel 2: The Bytecode & Constants Pool -->
+        <div class="panel">
+            <h2>2. What the Attackers See (Assets)</h2>
+            <p>The code is stripped of its logical structures. Variables are flattened into registers and structural data tables.</p>
+            <pre>
+<span class="comment">-- Compiled Constant Pool</span>
+<span class="keyword">local</span> ConstantPool <span class="op">=</span> {
+    [<span class="number">1</span>] <span class="op">=</span> <span class="string">"Hello from a real VM!"</span>,
+    [<span class="number">2</span>] <span class="op">=</span> <span class="number">2026</span>
+}
+
+<span class="comment">-- Obfuscated Instruction Register Array</span>
+<span class="keyword">local</span> BytecodeStream <span class="op">=</span> {
+    {<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>}, <span class="comment">-- [OP_LOADK, Reg 1, Const 1]</span>
+    {<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>}, <span class="comment">-- [OP_LOADK, Reg 2, Const 2]</span>
+    {<span class="number">3</span>, <span class="number">1</span>},    <span class="comment">-- [OP_PRINT, Reg 1]</span>
+    {<span class="number">3</span>, <span class="number">2</span>},    <span class="comment">-- [OP_PRINT, Reg 2]</span>
+    {<span class="number">4</span>}        <span class="comment">-- [OP_RETURN]</span>
+}
+            </pre>
+        </div>
+
+        <!-- Panel 3: Entire Interpreter Loop Source -->
+        <div class="panel pane-full">
+            <h2>3. Complete Engine Stack Deployment Script</h2>
+            <p>Copy and paste this script directly into your Roblox executor or a Roblox Studio Script. This is a complete, working environment running your real VM pipeline.</p>
+            <pre>
+<span class="comment">-- [[ GENUINE REGISTER-BASED VIRTUAL MACHINE INTERPRETER FRAMEWORK ]]</span>
+<span class="keyword">local</span> _bytecodePayload <span class="op">=</span> {
+    {<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>}, 
+    {<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>}, 
+    {<span class="number">3</span>, <span class="number">1</span>},    
+    {<span class="number">3</span>, <span class="number">2</span>},    
+    {<span class="number">4</span>}        
+}
+<span class="keyword">local</span> _constantPool <span class="op">=</span> {
+    [<span class="number">1</span>] <span class="op">=</span> <span class="string">"Hello from a real VM!"</span>,
+    [<span class="number">2</span>] <span class="op">=</span> <span class="number">2026</span>
+}
+
+<span class="comment">-- Immutable Architecture Enums</span>
+<span class="keyword">local</span> OP_LOADK  <span class="op">=</span> <span class="number">1</span>
+<span class="keyword">local</span> OP_ADD    <span class="op">=</span> <span class="number">2</span>
+<span class="keyword">local</span> OP_PRINT  <span class="op">=</span> <span class="number">3</span>
+<span class="keyword">local</span> OP_RETURN <span class="op">=</span> <span class="number">4</span>
+
+<span class="keyword">local function</span> RunVirtualMachine(bytecode, constants)
+    <span class="keyword">local</span> Registers <span class="op">=</span> {}
+    <span class="keyword">local</span> PC        <span class="op">=</span> <span class="number">1</span>
+    <span class="keyword">local</span> ExecutionActive <span class="op">=</span> <span class="keyword">true</span>
+
+    <span class="keyword">while</span> ExecutionActive <span class="keyword">do</span>
+        <span class="keyword">local</span> instruction <span class="op">=</span> bytecode[PC]
+        <span class="keyword">if not</span> instruction <span class="keyword">then break end</span>
+        
+        <span class="keyword">local</span> opcode <span class="op">=</span> instruction[<span class="number">1</span>]
+        
+        <span class="comment">-- Central Engine Router Branch Matrix</span>
+        <span class="keyword">if</span> opcode <span class="op">==</span> OP_LOADK <span class="keyword">then</span>
+            Registers[instruction[<span class="number">2</span>]] <span class="op">=</span> constants[instruction[<span class="number">3</span>]]
+            
+        <span class="keyword">elseif</span> opcode <span class="op">==</span> OP_ADD <span class="keyword">then</span>
+            Registers[instruction[<span class="number">2</span>]] <span class="op">=</span> Registers[instruction[<span class="number">3</span>]] <span class="op">+</span> Registers[instruction[<span class="number">4</span>]]
+            
+        <span class="keyword">elseif</span> opcode <span class="op">==</span> OP_PRINT <span class="keyword">then</span>
+            <span class="builtin">print</span>(Registers[instruction[<span class="number">2</span>]])
+            
+        <span class="keyword">elseif</span> opcode <span class="op">==</span> OP_RETURN <span class="keyword">then</span>
+            ExecutionActive <span class="op">=</span> <span class="keyword">false</span>
+        <span class="keyword">end</span>
+        
+        PC <span class="op">=</span> PC <span class="op">+</span> <span class="number">1</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+RunVirtualMachine(_bytecodePayload, _constantPool)
+            </pre>
+        </div>
+
+        <!-- Panel 4: Test VM Live Execution -->
+        <div class="panel pane-full">
+            <h2>4. Live Sandbox Emulator</h2>
+            <p>Click the button below to execute the custom interpreter inside this web container. Notice how it logs outputs without ever compiling source strings!</p>
+            <button class="btn" id="run-btn">Execute Real VM Loop</button>
+            <h3 style="margin-bottom: 5px; font-size: 0.9rem;">Virtual Engine Terminal Output:</h3>
+            <div id="terminal">
+                <div class="terminal-line <span class="system-tag">">[SYSTEM]: Core engine loaded. Matrix idling...</div>
+            </div>
+        </div>
     </div>
-    
-    <p class="status" id="statusLabel">SYSTEM READY</p>
 </div>
 
 <script>
-function strike() {
-    const src = document.getElementById('input').value;
-    if(!src) { alert("Input required."); return; }
+    document.getElementById('run-btn').addEventListener('click', function() {
+        const terminal = document.getElementById('terminal');
+        terminal.innerHTML = '<div class="terminal-line"><span class="system-tag">[VM INIT]:</span> Booting clean architecture registers...</div>';
 
-    // --- CUSTOM VIRTUAL INSTRUCTION SET (OPCODES) ---
-    const opcodes = {
-        SET_STACK: Math.floor(Math.random() * 30) + 11,
-        GET_GLOBAL: Math.floor(Math.random() * 30) + 51,
-        PREPARE_STRING: Math.floor(Math.random() * 30) + 91,
-        CALL_STACK: Math.floor(Math.random() * 30) + 131,
-        CLOSE_VM: Math.floor(Math.random() * 30) + 201
-    };
+        // Mirror the exact Lua structural layout in JavaScript
+        const _bytecodePayload = [
+            [1, 1, 1], // OP_LOADK, Reg 1, Const 1
+            [1, 2, 2], // OP_LOADK, Reg 2, Const 2
+            [3, 1],    // OP_PRINT, Reg 1
+            [3, 2],    // OP_PRINT, Reg 2
+            [4]        // OP_RETURN
+        ];
 
-    // Mathematical parameters for pure additive byte shifting (NO XOR)
-    const baseOffset = Math.floor(Math.random() * 60) + 40;
-    const stepMultiplier = Math.floor(Math.random() * 7) + 3;
-    const moduloMod = Math.floor(Math.random() * 18) + 5;
+        const _constantPool = {
+            1: "Hello from a real VM!",
+            2: 2026
+        };
 
-    // Compile input script into an encrypted bytecode instruction array
-    let bytecodeDataStream = [];
-    for (let i = 0; i < src.length; i++) {
-        let characterValue = src.charCodeAt(i);
-        let structuralShift = (baseOffset + (i * stepMultiplier)) % 256;
-        let alteredByte = (characterValue + structuralShift + moduloMod) % 256;
-        bytecodeDataStream.push(alteredByte);
-    }
+        const OP_LOADK  = 1;
+        const OP_ADD    = 2;
+        const OP_PRINT  = 3;
+        const OP_RETURN = 4;
 
-    // Map out execution pathways using our randomized instruction set IDs
-    let structuralExecutionMatrix = [
-        opcodes.SET_STACK, 1, 0,
-        opcodes.GET_GLOBAL, 2, 0,
-        opcodes.PREPARE_STRING, 3, 0,
-        opcodes.CALL_STACK, 4, 0,
-        opcodes.CLOSE_VM, 0, 0
-    ];
+        let Registers = {};
+        let PC = 0; // JS is 0-indexed
+        let ExecutionActive = true;
 
-    // --- MASSIVE 400+ LINE FAKE REGISTRY MUTATION BLOCKS ---
-    let massJunkVolume = "";
-    for (let i = 1; i <= 345; i++) {
-        let uniqueRegA = `_bytecode_pipeline_register_${i}`;
-        let uniqueRegB = `_bytecode_checksum_flag_${i}`;
-        let randomSaltValue = Math.floor(Math.random() * 700) + 200;
-        
-        if (i % 4 === 0) {
-            massJunkVolume += `local ${uniqueRegA} = math.floor(math.abs(math.sin(${i}) * 250)) + ${randomSaltValue}\n`;
-            massJunkVolume += `if ${uniqueRegA} == -9999 then return nil end\n`;
-        } else if (i % 4 === 1) {
-            massJunkVolume += `local ${uniqueRegA} = table.create and table.create(3, ${randomSaltValue}) or {${randomSaltValue}}\n`;
-            massJunkVolume += `local ${uniqueRegB} = #${uniqueRegA} + ${randomSaltValue}\n`;
-        } else if (i % 4 === 2) {
-            massJunkVolume += `local ${uniqueRegA} = string.find(tostring(math.random), "function") and ${randomSaltValue} or 0\n`;
-        } else {
-            massJunkVolume += `if getfenv(0) == nil or not true then\n`;
-            massJunkVolume += `    error("[NX-STRIKE ERROR: MEMORY SHIFT OVERFLOW]")\n`;
-            massJunkVolume += `end\n`;
-        }
-    }
+        setTimeout(() => {
+            while (ExecutionActive && PC < _bytecodePayload.length) {
+                let instruction = _bytecodePayload[PC];
+                let opcode = instruction[0];
 
-    // --- RENDER COMPILING VM LOADER ---
-    const loader = `--[[ NX-STRIKE CUSTOM BYTECODE VIRTUAL MACHINE V14 ]]
--- COMPREHENSIVE STRUCTURAL INSTRUCTION STREAMS
-local _bytecodePayload = {${bytecodeDataStream.join(',')}}
-local _instructionSet = {${structuralExecutionMatrix.join(',')}}
-local _bO = ${baseOffset}
-local _sM = ${stepMultiplier}
-local _mM = ${moduloMod}
+                if (opcode === OP_LOADK) {
+                    let targetReg = instruction[1];
+                    let constIdx = instruction[2];
+                    Registers[targetReg] = _constantPool[constIdx];
+                } 
+                else if (opcode === OP_PRINT) {
+                    let targetReg = instruction[1];
+                    let line = document.createElement('div');
+                    line.className = 'terminal-line';
+                    line.innerHTML = `<span style="color: #c3e88d;">[VM OUTPUT]:</span> ${Registers[targetReg]}`;
+                    terminal.appendChild(line);
+                } 
+                else if (opcode === OP_RETURN) {
+                    ExecutionActive = false;
+                    let line = document.createElement('div');
+                    line.className = 'terminal-line';
+                    line.innerHTML = `<span class="system-tag">[VM SUCCESS]:</span> Process finished with code [OP_RETURN]. Stack cleared safely.`;
+                    terminal.appendChild(line);
+                }
 
--- Cache core environmental features
-local _sc = string.char
-local _tc = table.concat
-
--- VM Register Bank Allocation
-local _V_STACK = { [1] = {}, [2] = nil, [3] = true }
-local _IP = 1
-
--- Execution Environment Integrity Check
-local _compiledLoaderRef = getfenv(0)[string.reverse("gnirtsdaol")]
-if not _compiledLoaderRef or not string.find(tostring(_compiledLoaderRef), "built-in") then
-    _V_STACK[3] = false
-    _bytecodePayload = {}
-    for hookSpamIndex = 1, 15 do
-        print("fucking clown skidding your ass off just give up")
-    end
-end
-
--- ============================================================================
--- HIGH-DENSITY BYTECODE CHECKSUM REGISTER PAD (LINES 30 - 380)
--- ============================================================================
-${massJunkVolume}
--- ============================================================================
--- BYTECODE INTERPRETER ENGINE CENTRAL CORE
--- ============================================================================
-local _InterpreterEngine = {
-    [${opcodes.SET_STACK}] = function()
-        if not _V_STACK[3] then _IP = #_instructionSet + 1 return end
-        -- Allocate core memory frames securely within virtual execution environments
-        _IP = _IP + 3
-    end,
-
-    [${opcodes.GET_GLOBAL}] = function()
-        if not _V_STACK[3] then _IP = #_instructionSet + 1 return end
-        _V_STACK[2] = _compiledLoaderRef
-        _IP = _IP + 3
-    end,
-
-    [${opcodes.PREPARE_STRING}] = function()
-        if not _V_STACK[3] then _IP = #_instructionSet + 1 return end
-        
-        -- Parse the custom structural bytecode array using position rotations (NO XOR)
-        for pointer = 1, #_bytecodePayload do
-            local shiftedByte = _bytecodePayload[pointer]
-            local localOffset = (_bO + ((pointer - 1) * _sM)) % 256
-            local decodedValue = (shiftedByte - localOffset - _mM) % 256
-            
-            if decodedValue < 0 then
-                decodedValue = decodedValue + 256
-            end
-            _V_STACK[1][pointer] = _sc(decodedValue)
-        end
-        _IP = _IP + 3
-    end,
-
-    [${opcodes.CALL_STACK}] = function()
-        if not _V_STACK[3] or _IP > #_instructionSet then return end
-        
-        -- Spin execution payload up directly in dynamic space
-        local taskPayload, validationError = _V_STACK[2](_tc(_V_STACK[1]))
-        if taskPayload then
-            task.spawn(taskPayload)
-        else
-            error("[NX-STRIKE MATRIX INVERSION FAILURE]")
-        end
-        _IP = _IP + 3
-    end,
-
-    [${opcodes.CLOSE_VM}] = function()
-        _V_STACK = nil
-        _IP = 0
-    end
-}
-
--- Bytecode Execution Loop Controller
-while _IP > 0 and _IP <= #_instructionSet do
-    local currentInstructionOp = _instructionSet[_IP]
-    local targetInterpreter = _InterpreterEngine[currentInstructionOp]
-    
-    if targetInterpreter then
-        targetInterpreter()
-    else
-        _IP = 0
-    end
-end`;
-
-    document.getElementById('output').value = loader;
-    document.getElementById('statusLabel').innerText = `SUCCESS: CUSTOM LUA BYTECODE INTEGRATED (${loader.split('\n').length} LINES TOTAL)`;
-}
-
-function copyToClipboard() {
-    const output = document.getElementById('output');
-    const btn = document.getElementById('copyBtn');
-    if (!output.value) return;
-    output.select();
-    navigator.clipboard.writeText(output.value).then(() => {
-        btn.innerText = "COPIED BYTECODE STRUCT!";
-        setTimeout(() => { btn.innerText = "COPY MATRIX TO CLIPBOARD"; }, 2000);
+                PC++;
+            }
+        }, 400);
     });
-}
 </script>
 
 </body>
