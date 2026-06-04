@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NX-STRIKE | Ghost Shield V14 (BYTECODE MATRIX)</title>
+    <style>
+        body { background: #020202; color: #00ff00; font-family: 'Consolas', monospace; padding: 30px; text-align: center; }
+        .container { max-width: 850px; margin: auto; background: #050505; border: 1px solid #00ff00; padding: 25px; border-radius: 2px; box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
+        textarea { width: 100%; height: 200px; background: #000; color: #00ff00; border: 1px solid #00ff0044; padding: 15px; font-size: 11px; outline: none; margin-bottom: 20px; box-sizing: border-box; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 5px; transition: 0.3s; margin-bottom: 10px; }
+        .btn:hover { background: #fff; box-shadow: 0 0 20px #00ff00; }
+        .copy-btn { background: #111; color: #00ff00; border: 1px solid #00ff00; padding: 10px; width: 100%; font-size: 10px; letter-spacing: 2px; cursor: pointer; transition: 0.2s; }
+        .copy-btn:hover { background: #00ff00; color: #000; }
+        .status { font-size: 10px; color: #444; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="letter-spacing: 10px; margin-bottom: 5px;">NX-STRIKE V14</h1>
+    <p style="color:#00ff00; font-size:10px; margin-bottom: 25px; opacity: 0.6;">CUSTOM LUA BYTECODE COMPILER | NON-XOR POSITION SHIFT | 400+ LINES</p>
+    
+    <textarea id="input" placeholder="[ PASTE RAW SOURCE CODE HERE ]"></textarea>
+    
+    <button class="btn" onclick="strike()">STRIKE & PROTECT (BYTECODE VM)</button>
+    
+    <div style="margin-top: 25px;">
+        <label style="display:block; font-size:10px; color:#666; margin-bottom:5px;">VIRTUALIZED STRUCTURAL RUNTIME</label>
+        <textarea id="output" readonly placeholder="[ CUSTOM BYTECODE SYSTEM READY ]"></textarea>
+        <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">COPY MATRIX TO CLIPBOARD</button>
+    </div>
+    
+    <p class="status" id="statusLabel">SYSTEM READY</p>
+</div>
+
+<script>
+function strike() {
+    const src = document.getElementById('input').value;
+    if(!src) { alert("Input required."); return; }
+
+    // --- CUSTOM VIRTUAL INSTRUCTION SET (OPCODES) ---
+    const opcodes = {
+        SET_STACK: Math.floor(Math.random() * 30) + 11,
+        GET_GLOBAL: Math.floor(Math.random() * 30) + 51,
+        PREPARE_STRING: Math.floor(Math.random() * 30) + 91,
+        CALL_STACK: Math.floor(Math.random() * 30) + 131,
+        CLOSE_VM: Math.floor(Math.random() * 30) + 201
+    };
+
+    // Mathematical parameters for pure additive byte shifting (NO XOR)
+    const baseOffset = Math.floor(Math.random() * 60) + 40;
+    const stepMultiplier = Math.floor(Math.random() * 7) + 3;
+    const moduloMod = Math.floor(Math.random() * 18) + 5;
+
+    // Compile input script into an encrypted bytecode instruction array
+    let bytecodeDataStream = [];
+    for (let i = 0; i < src.length; i++) {
+        let characterValue = src.charCodeAt(i);
+        let structuralShift = (baseOffset + (i * stepMultiplier)) % 256;
+        let alteredByte = (characterValue + structuralShift + moduloMod) % 256;
+        bytecodeDataStream.push(alteredByte);
+    }
+
+    // Map out execution pathways using our randomized instruction set IDs
+    let structuralExecutionMatrix = [
+        opcodes.SET_STACK, 1, 0,
+        opcodes.GET_GLOBAL, 2, 0,
+        opcodes.PREPARE_STRING, 3, 0,
+        opcodes.CALL_STACK, 4, 0,
+        opcodes.CLOSE_VM, 0, 0
+    ];
+
+    // --- MASSIVE 400+ LINE FAKE REGISTRY MUTATION BLOCKS ---
+    let massJunkVolume = "";
+    for (let i = 1; i <= 345; i++) {
+        let uniqueRegA = `_bytecode_pipeline_register_${i}`;
+        let uniqueRegB = `_bytecode_checksum_flag_${i}`;
+        let randomSaltValue = Math.floor(Math.random() * 700) + 200;
+        
+        if (i % 4 === 0) {
+            massJunkVolume += `local ${uniqueRegA} = math.floor(math.abs(math.sin(${i}) * 250)) + ${randomSaltValue}\n`;
+            massJunkVolume += `if ${uniqueRegA} == -9999 then return nil end\n`;
+        } else if (i % 4 === 1) {
+            massJunkVolume += `local ${uniqueRegA} = table.create and table.create(3, ${randomSaltValue}) or {${randomSaltValue}}\n`;
+            massJunkVolume += `local ${uniqueRegB} = #${uniqueRegA} + ${randomSaltValue}\n`;
+        } else if (i % 4 === 2) {
+            massJunkVolume += `local ${uniqueRegA} = string.find(tostring(math.random), "function") and ${randomSaltValue} or 0\n`;
+        } else {
+            massJunkVolume += `if getfenv(0) == nil or not true then\n`;
+            massJunkVolume += `    error("[NX-STRIKE ERROR: MEMORY SHIFT OVERFLOW]")\n`;
+            massJunkVolume += `end\n`;
+        }
+    }
+
+    // --- RENDER COMPILING VM LOADER ---
+    const loader = `--[[ NX-STRIKE CUSTOM BYTECODE VIRTUAL MACHINE V14 ]]
+-- COMPREHENSIVE STRUCTURAL INSTRUCTION STREAMS
+local _bytecodePayload = {${bytecodeDataStream.join(',')}}
+local _instructionSet = {${structuralExecutionMatrix.join(',')}}
+local _bO = ${baseOffset}
+local _sM = ${stepMultiplier}
+local _mM = ${moduloMod}
+
+-- Cache core environmental features
+local _sc = string.char
+local _tc = table.concat
+
+-- VM Register Bank Allocation
+local _V_STACK = { [1] = {}, [2] = nil, [3] = true }
+local _IP = 1
+
+-- Execution Environment Integrity Check
+local _compiledLoaderRef = getfenv(0)[string.reverse("gnirtsdaol")]
+if not _compiledLoaderRef or not string.find(tostring(_compiledLoaderRef), "built-in") then
+    _V_STACK[3] = false
+    _bytecodePayload = {}
+    for hookSpamIndex = 1, 15 do
+        print("fucking clown skidding your ass off just give up")
+    end
+end
+
+-- ============================================================================
+-- HIGH-DENSITY BYTECODE CHECKSUM REGISTER PAD (LINES 30 - 380)
+-- ============================================================================
+${massJunkVolume}
+-- ============================================================================
+-- BYTECODE INTERPRETER ENGINE CENTRAL CORE
+-- ============================================================================
+local _InterpreterEngine = {
+    [${opcodes.SET_STACK}] = function()
+        if not _V_STACK[3] then _IP = #_instructionSet + 1 return end
+        -- Allocate core memory frames securely within virtual execution environments
+        _IP = _IP + 3
+    end,
+
+    [${opcodes.GET_GLOBAL}] = function()
+        if not _V_STACK[3] then _IP = #_instructionSet + 1 return end
+        _V_STACK[2] = _compiledLoaderRef
+        _IP = _IP + 3
+    end,
+
+    [${opcodes.PREPARE_STRING}] = function()
+        if not _V_STACK[3] then _IP = #_instructionSet + 1 return end
+        
+        -- Parse the custom structural bytecode array using position rotations (NO XOR)
+        for pointer = 1, #_bytecodePayload do
+            local shiftedByte = _bytecodePayload[pointer]
+            local localOffset = (_bO + ((pointer - 1) * _sM)) % 256
+            local decodedValue = (shiftedByte - localOffset - _mM) % 256
+            
+            if decodedValue < 0 then
+                decodedValue = decodedValue + 256
+            end
+            _V_STACK[1][pointer] = _sc(decodedValue)
+        end
+        _IP = _IP + 3
+    end,
+
+    [${opcodes.CALL_STACK}] = function()
+        if not _V_STACK[3] or _IP > #_instructionSet then return end
+        
+        -- Spin execution payload up directly in dynamic space
+        local taskPayload, validationError = _V_STACK[2](_tc(_V_STACK[1]))
+        if taskPayload then
+            task.spawn(taskPayload)
+        else
+            error("[NX-STRIKE MATRIX INVERSION FAILURE]")
+        end
+        _IP = _IP + 3
+    end,
+
+    [${opcodes.CLOSE_VM}] = function()
+        _V_STACK = nil
+        _IP = 0
+    end
+}
+
+-- Bytecode Execution Loop Controller
+while _IP > 0 and _IP <= #_instructionSet do
+    local currentInstructionOp = _instructionSet[_IP]
+    local targetInterpreter = _InterpreterEngine[currentInstructionOp]
+    
+    if targetInterpreter then
+        targetInterpreter()
+    else
+        _IP = 0
+    end
+end`;
+
+    document.getElementById('output').value = loader;
+    document.getElementById('statusLabel').innerText = `SUCCESS: CUSTOM LUA BYTECODE INTEGRATED (${loader.split('\n').length} LINES TOTAL)`;
+}
+
+function copyToClipboard() {
+    const output = document.getElementById('output');
+    const btn = document.getElementById('copyBtn');
+    if (!output.value) return;
+    output.select();
+    navigator.clipboard.writeText(output.value).then(() => {
+        btn.innerText = "COPIED BYTECODE STRUCT!";
+        setTimeout(() => { btn.innerText = "COPY MATRIX TO CLIPBOARD"; }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>
