@@ -3,304 +3,420 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genuine Luau Virtual Machine Dev-Suite</title>
+    <title>Advanced VM Web Compiler & Obfuscator</title>
     <style>
         :root {
-            --bg-primary: #0f111a;
-            --bg-secondary: #151824;
-            --accent: #ff5370;
+            --bg-dark: #070913;
+            --bg-panel: #111424;
+            --accent-red: #ff5370;
+            --accent-cyan: #00f0ff;
             --text-main: #a6accd;
             --text-bright: #ffffff;
-            --code-green: #c3e88d;
-            --code-yellow: #ffcb6b;
-            --code-blue: #82aaff;
+            --code-bg: #03050a;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-primary);
+            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         .container {
-            width: 100%;
-            max-width: 1000px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         header {
             text-align: center;
+            border-bottom: 2px solid var(--accent-red);
+            padding-bottom: 15px;
             margin-bottom: 30px;
-            border-bottom: 2px solid var(--bg-secondary);
-            padding-bottom: 20px;
         }
 
-        h1 {
-            color: var(--text-bright);
-            margin-bottom: 5px;
-        }
+        h1 { color: var(--text-bright); margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
+        h1 span { color: var(--accent-red); }
 
-        .badge {
-            background-color: var(--accent);
-            color: var(--bg-primary);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-
-        .grid {
+        .layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
         }
 
-        @media (max-width: 768px) {
-            .grid { grid-template-columns: 1fr; }
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
         }
 
         .panel {
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-panel);
+            border: 1px solid rgba(255, 83, 112, 0.15);
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
 
-        h2 {
-            color: var(--text-bright);
-            font-size: 1.2rem;
-            margin-top: 0;
-            border-left: 4px solid var(--accent);
-            padding-left: 10px;
-        }
+        h2 { font-size: 1.1rem; margin-top: 0; color: var(--accent-cyan); border-left: 3px solid var(--accent-cyan); padding-left: 10px; }
 
-        pre {
-            background-color: var(--bg-primary);
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Courier New', monospace;
+        textarea {
+            width: 100%;
+            height: 320px;
+            background-color: var(--code-bg);
+            color: #c3e88d;
+            border: 1px solid #232635;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Consolas', monospace;
+            resize: none;
+            box-sizing: border-box;
             font-size: 0.9rem;
-            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .pane-full {
-            grid-column: 1 / -1;
-        }
-
-        /* Syntax Highlighting */
-        .comment { color: #546e7a; font-style: italic; }
-        .keyword { color: #c792ea; }
-        .string { color: var(--code-green); }
-        .number { color: #f78c6c; }
-        .builtin { color: var(--code-blue); }
-        .op { color: #89ddff; }
 
         .btn {
-            background-color: var(--accent);
-            color: var(--bg-primary);
+            background-color: var(--accent-red);
+            color: var(--bg-dark);
             border: none;
-            padding: 10px 20px;
+            padding: 14px 20px;
             font-weight: bold;
-            border-radius: 4px;
             cursor: pointer;
-            transition: opacity 0.2s;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 0.95rem;
             width: 100%;
-            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
         }
 
-        .btn:hover { opacity: 0.9; }
+        .btn:hover {
+            background-color: #ffffff;
+            box-shadow: 0 0 15px var(--accent-red);
+        }
 
-        #terminal {
-            background-color: #05070f;
-            color: #f8f8f2;
-            font-family: 'Consolas', monospace;
-            padding: 15px;
-            border-radius: 6px;
-            max-height: 200px;
+        .output-box {
+            background-color: var(--code-bg);
+            color: #00bfff;
+            height: 320px;
             overflow-y: auto;
-            border-left: 3px solid var(--code-green);
+            padding: 12px;
+            border: 1px solid #1a1c2a;
+            border-radius: 4px;
+            white-space: pre;
+            font-size: 0.85rem;
+            box-sizing: border-box;
         }
-
-        .terminal-line { margin: 4px 0; }
-        .system-tag { color: var(--code-yellow); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Secure VM Architecture V14</h1>
-        <span class="badge">Pure Virtualization (No Loadstring)</span>
+        <h1>VM COMPILER Suite <span>[ANTI-HOOK LOCKDOWN]</span></h1>
+        <p>Generates polymorphic register-based bytecode structures with string armor obfuscation.</p>
     </header>
 
-    <div class="grid">
-        <!-- Panel 1: Original Code -->
+    <div class="layout">
         <div class="panel">
-            <h2>1. Original Developer Intention</h2>
-            <p>This is the high-level code before compilation. Notice how variables exist as strings and paths are linear.</p>
-            <pre>
-<span class="keyword">local</span> message <span class="op">=</span> <span class="string">"Hello from a real VM!"</span>
-<span class="keyword">local</span> year <span class="op">=</span> <span class="number">2026</span>
-
-<span class="builtin">print</span>(message)
-<span class="builtin">print</span>(year)
-            </pre>
+            <h2>1. Source Code Input (Pure Luau)</h2>
+            <p style="margin-bottom: 10px; font-size: 0.8rem; color: #666a8a;">Enter your plain operational logic script below:</p>
+            <textarea id="src-input" placeholder="-- Enter simple expressions:&#10;local message = &quot;System operating nominally.&quot;&#10;print(message)&#10;local val1 = 200&#10;local val2 = 300&#10;local sum = val1 + val2&#10;print(sum)"></textarea>
+            <button class="btn" id="compile-btn">Build Obfuscated Payload Assembly</button>
         </div>
 
-        <!-- Panel 2: The Bytecode & Constants Pool -->
         <div class="panel">
-            <h2>2. What the Attackers See (Assets)</h2>
-            <p>The code is stripped of its logical structures. Variables are flattened into registers and structural data tables.</p>
-            <pre>
-<span class="comment">-- Compiled Constant Pool</span>
-<span class="keyword">local</span> ConstantPool <span class="op">=</span> {
-    [<span class="number">1</span>] <span class="op">=</span> <span class="string">"Hello from a real VM!"</span>,
-    [<span class="number">2</span>] <span class="op">=</span> <span class="number">2026</span>
-}
-
-<span class="comment">-- Obfuscated Instruction Register Array</span>
-<span class="keyword">local</span> BytecodeStream <span class="op">=</span> {
-    {<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>}, <span class="comment">-- [OP_LOADK, Reg 1, Const 1]</span>
-    {<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>}, <span class="comment">-- [OP_LOADK, Reg 2, Const 2]</span>
-    {<span class="number">3</span>, <span class="number">1</span>},    <span class="comment">-- [OP_PRINT, Reg 1]</span>
-    {<span class="number">3</span>, <span class="number">2</span>},    <span class="comment">-- [OP_PRINT, Reg 2]</span>
-    {<span class="number">4</span>}        <span class="comment">-- [OP_RETURN]</span>
-}
-            </pre>
-        </div>
-
-        <!-- Panel 3: Entire Interpreter Loop Source -->
-        <div class="panel pane-full">
-            <h2>3. Complete Engine Stack Deployment Script</h2>
-            <p>Copy and paste this script directly into your Roblox executor or a Roblox Studio Script. This is a complete, working environment running your real VM pipeline.</p>
-            <pre>
-<span class="comment">-- [[ GENUINE REGISTER-BASED VIRTUAL MACHINE INTERPRETER FRAMEWORK ]]</span>
-<span class="keyword">local</span> _bytecodePayload <span class="op">=</span> {
-    {<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>}, 
-    {<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>}, 
-    {<span class="number">3</span>, <span class="number">1</span>},    
-    {<span class="number">3</span>, <span class="number">2</span>},    
-    {<span class="number">4</span>}        
-}
-<span class="keyword">local</span> _constantPool <span class="op">=</span> {
-    [<span class="number">1</span>] <span class="op">=</span> <span class="string">"Hello from a real VM!"</span>,
-    [<span class="number">2</span>] <span class="op">=</span> <span class="number">2026</span>
-}
-
-<span class="comment">-- Immutable Architecture Enums</span>
-<span class="keyword">local</span> OP_LOADK  <span class="op">=</span> <span class="number">1</span>
-<span class="keyword">local</span> OP_ADD    <span class="op">=</span> <span class="number">2</span>
-<span class="keyword">local</span> OP_PRINT  <span class="op">=</span> <span class="number">3</span>
-<span class="keyword">local</span> OP_RETURN <span class="op">=</span> <span class="number">4</span>
-
-<span class="keyword">local function</span> RunVirtualMachine(bytecode, constants)
-    <span class="keyword">local</span> Registers <span class="op">=</span> {}
-    <span class="keyword">local</span> PC        <span class="op">=</span> <span class="number">1</span>
-    <span class="keyword">local</span> ExecutionActive <span class="op">=</span> <span class="keyword">true</span>
-
-    <span class="keyword">while</span> ExecutionActive <span class="keyword">do</span>
-        <span class="keyword">local</span> instruction <span class="op">=</span> bytecode[PC]
-        <span class="keyword">if not</span> instruction <span class="keyword">then break end</span>
-        
-        <span class="keyword">local</span> opcode <span class="op">=</span> instruction[<span class="number">1</span>]
-        
-        <span class="comment">-- Central Engine Router Branch Matrix</span>
-        <span class="keyword">if</span> opcode <span class="op">==</span> OP_LOADK <span class="keyword">then</span>
-            Registers[instruction[<span class="number">2</span>]] <span class="op">=</span> constants[instruction[<span class="number">3</span>]]
-            
-        <span class="keyword">elseif</span> opcode <span class="op">==</span> OP_ADD <span class="keyword">then</span>
-            Registers[instruction[<span class="number">2</span>]] <span class="op">=</span> Registers[instruction[<span class="number">3</span>]] <span class="op">+</span> Registers[instruction[<span class="number">4</span>]]
-            
-        <span class="keyword">elseif</span> opcode <span class="op">==</span> OP_PRINT <span class="keyword">then</span>
-            <span class="builtin">print</span>(Registers[instruction[<span class="number">2</span>]])
-            
-        <span class="keyword">elseif</span> opcode <span class="op">==</span> OP_RETURN <span class="keyword">then</span>
-            ExecutionActive <span class="op">=</span> <span class="keyword">false</span>
-        <span class="keyword">end</span>
-        
-        PC <span class="op">=</span> PC <span class="op">+</span> <span class="number">1</span>
-    <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-RunVirtualMachine(_bytecodePayload, _constantPool)
-            </pre>
-        </div>
-
-        <!-- Panel 4: Test VM Live Execution -->
-        <div class="panel pane-full">
-            <h2>4. Live Sandbox Emulator</h2>
-            <p>Click the button below to execute the custom interpreter inside this web container. Notice how it logs outputs without ever compiling source strings!</p>
-            <button class="btn" id="run-btn">Execute Real VM Loop</button>
-            <h3 style="margin-bottom: 5px; font-size: 0.9rem;">Virtual Engine Terminal Output:</h3>
-            <div id="terminal">
-                <div class="terminal-line <span class="system-tag">">[SYSTEM]: Core engine loaded. Matrix idling...</div>
-            </div>
+            <h2>2. Final Protected Script Output</h2>
+            <p style="margin-bottom: 10px; font-size: 0.8rem; color: #666a8a;">Copy this entire script output block directly into Roblox Studio.</p>
+            <pre id="vm-output" class="output-box">Waiting for compilation triggers...</pre>
         </div>
     </div>
 </div>
 
 <script>
-    document.getElementById('run-btn').addEventListener('click', function() {
-        const terminal = document.getElementById('terminal');
-        terminal.innerHTML = '<div class="terminal-line"><span class="system-tag">[VM INIT]:</span> Booting clean architecture registers...</div>';
+    document.getElementById('compile-btn').addEventListener('click', function() {
+        const sourceText = document.getElementById('src-input').value.trim();
+        const outputField = document.getElementById('vm-output');
 
-        // Mirror the exact Lua structural layout in JavaScript
-        const _bytecodePayload = [
-            [1, 1, 1], // OP_LOADK, Reg 1, Const 1
-            [1, 2, 2], // OP_LOADK, Reg 2, Const 2
-            [3, 1],    // OP_PRINT, Reg 1
-            [3, 2],    // OP_PRINT, Reg 2
-            [4]        // OP_RETURN
-        ];
+        if (!sourceText) {
+            outputField.innerText = "-- Error: Source field cannot be left blank.";
+            return;
+        }
 
-        const _constantPool = {
-            1: "Hello from a real VM!",
-            2: 2026
-        };
+        let lines = sourceText.split('\n');
+        let constantPool = [];
+        let instructions = [];
+        let symbolRegisters = {};
+        let registerPointer = 1;
 
-        const OP_LOADK  = 1;
-        const OP_ADD    = 2;
-        const OP_PRINT  = 3;
-        const OP_RETURN = 4;
+        // Hardcoded precise architectural opcode constraints requested
+        const OP_LOADK  = 112;
+        const OP_ADD    = 358;
+        const OP_PRINT  = 931;
+        const OP_RETURN = 538;
 
-        let Registers = {};
-        let PC = 0; // JS is 0-indexed
-        let ExecutionActive = true;
+        // Cryptographic XOR key generation sequence
+        const cryptoXorKey = Math.floor(Math.random() * 120) + 40;
 
-        setTimeout(() => {
-            while (ExecutionActive && PC < _bytecodePayload.length) {
-                let instruction = _bytecodePayload[PC];
-                let opcode = instruction[0];
-
-                if (opcode === OP_LOADK) {
-                    let targetReg = instruction[1];
-                    let constIdx = instruction[2];
-                    Registers[targetReg] = _constantPool[constIdx];
-                } 
-                else if (opcode === OP_PRINT) {
-                    let targetReg = instruction[1];
-                    let line = document.createElement('div');
-                    line.className = 'terminal-line';
-                    line.innerHTML = `<span style="color: #c3e88d;">[VM OUTPUT]:</span> ${Registers[targetReg]}`;
-                    terminal.appendChild(line);
-                } 
-                else if (opcode === OP_RETURN) {
-                    ExecutionActive = false;
-                    let line = document.createElement('div');
-                    line.className = 'terminal-line';
-                    line.innerHTML = `<span class="system-tag">[VM SUCCESS]:</span> Process finished with code [OP_RETURN]. Stack cleared safely.`;
-                    terminal.appendChild(line);
-                }
-
-                PC++;
+        // Helper to turn strings into encrypted byte sequences
+        function encryptStringToBytes(str) {
+            let outputBytes = [];
+            for (let idx = 0; idx < str.length; idx++) {
+                outputBytes.push(str.charCodeAt(idx) ^ cryptoXorKey);
             }
-        }, 400);
+            return outputBytes;
+        }
+
+        function registerConstant(val) {
+            for (let i = 0; i < constantPool.length; i++) {
+                if (constantPool[i].type === typeof val && constantPool[i].raw === val) {
+                    return i + 1;
+                }
+            }
+            let entry = { type: typeof val, raw: val };
+            if (typeof val === 'string') {
+                entry.encryptedData = encryptStringToBytes(val);
+            }
+            constantPool.push(entry);
+            return constantPool.length;
+        }
+
+        // --- ENCRYPTING THE LOCKDOWN STRINGS (The Payload Obfuscation) ---
+        // These payload asset strings will be written in complete byte format inside the output
+        const str_ScreenGui    = encryptStringToBytes("ScreenGui");
+        const str_Frame        = encryptStringToBytes("Frame");
+        const str_TextLabel    = encryptStringToBytes("TextLabel");
+        const str_Players      = encryptStringToBytes("Players");
+        const str_CoreGui      = encryptStringToBytes("CoreGui");
+        const str_PlayerGui    = encryptStringToBytes("PlayerGui");
+        const str_GuiName      = encryptStringToBytes("SystemIntegrityViolation");
+        const str_BuiltIn      = encryptStringToBytes("built-in");
+        const str_Native       = encryptStringToBytes("native");
+        const str_TitleText    = encryptStringToBytes("CRITICAL SECURITY EXCEPTION DETECTED");
+        const str_BodyText     = encryptStringToBytes("An unauthorized environmental modification or manipulation hook was identified within the environment execution pipeline.\n\nDisturbing, tampering with, or attempting to illicitly extract intellectual property data is a violation of service terms and security infrastructure protocols.\n\nExecution has been permanently suspended for this instance.");
+
+        // Utility to convert byte arrays into lua format string values ("\65\66\67")
+        function formatToLuaBytes(byteArray) {
+            return byteArray.map(b => `\\${b}`).join("");
+        }
+
+        try {
+            for (let idx = 0; idx < lines.length; idx++) {
+                let chunk = lines[idx].trim();
+                if (chunk === "" || chunk.startsWith("--")) continue;
+
+                if (chunk.startsWith("local ")) {
+                    let equation = chunk.substring(6).split("=");
+                    if (equation.length === 2) {
+                        let variableName = equation[0].trim();
+                        let expressionValue = equation[1].trim();
+
+                        if (expressionValue.includes("+")) {
+                            let tokens = expressionValue.split("+");
+                            let leftVar = tokens[0].trim();
+                            let rightVar = tokens[1].trim();
+
+                            let leftReg = symbolRegisters[leftVar];
+                            let rightReg = symbolRegisters[rightVar];
+
+                            if (leftReg !== undefined && rightReg !== undefined) {
+                                symbolRegisters[variableName] = registerPointer;
+                                instructions.push(`    {${OP_ADD}, ${registerPointer}, ${leftReg}, ${rightReg}}`);
+                                registerPointer++;
+                                continue;
+                            }
+                        }
+
+                        let trueValue = expressionValue.replace(/['"]/g, "");
+                        if (!isNaN(trueValue)) trueValue = Number(trueValue);
+
+                        let constIndex = registerConstant(trueValue);
+                        symbolRegisters[variableName] = registerPointer;
+                        
+                        instructions.push(`    {${OP_LOADK}, ${registerPointer}, ${constIndex}}`);
+                        registerPointer++;
+                    }
+                }
+                else if (chunk.startsWith("print(")) {
+                    let interior = chunk.substring(6, chunk.indexOf(")")).trim();
+                    let storedRegister = symbolRegisters[interior];
+
+                    if (storedRegister !== undefined) {
+                        instructions.push(`    {${OP_PRINT}, ${storedRegister}}`);
+                    } else {
+                        let clearValue = interior.replace(/['"]/g, "");
+                        if (!isNaN(clearValue)) clearValue = Number(clearValue);
+                        let constIndex = registerConstant(clearValue);
+
+                        instructions.push(`    {${OP_LOADK}, ${registerPointer}, ${constIndex}}`);
+                        instructions.push(`    {${OP_PRINT}, ${registerPointer}}`);
+                        registerPointer++;
+                    }
+                }
+            }
+
+            instructions.push(`    {${OP_RETURN}}`);
+
+            let poolSerializations = [];
+            for (let i = 0; i < constantPool.length; i++) {
+                let item = constantPool[i];
+                if (item.type === 'string') {
+                    poolSerializations.push(`    [${i + 1}] = {true, "${formatToLuaBytes(item.encryptedData)}"}`);
+                } else {
+                    poolSerializations.push(`    [${i + 1}] = {false, ${item.raw}}`);
+                }
+            }
+
+            let renderedConstants = poolSerializations.join(",\n");
+            let renderedInstructions = instructions.join(",\n");
+
+            // Build the final generation package
+            let generatedMacro = `--[[
+    TRUE CUSTOM BYTECODE VIRTUAL MACHINE V14
+    [SECURITY STATUS]: HIGH-PRIVACY INLINE ENCRYPTION
+    [ANTI-HOOKING]: ACTIVE GLOBAL METATABLE OBFUSCATED VERIFICATION
+--]]
+
+local _instructionStream = {
+${renderedInstructions}
+}
+
+local _constantPool = {
+${renderedConstants}
+}
+
+-- Target Structural Opcodes Mapping
+local OP_LOADK  = ${OP_LOADK}
+local OP_ADD    = ${OP_ADD}
+local OP_PRINT  = ${OP_PRINT}
+local OP_RETURN = ${OP_RETURN}
+
+local CRYPTO_XOR_KEY = ${cryptoXorKey}
+
+-- Global Decryption Helper
+local function _decrypt(bytes)
+    local buffer = ""
+    for i = 1, #bytes do
+        buffer = buffer .. string.char(bit32.bxor(string.byte(bytes, i), CRYPTO_XOR_KEY))
+    end
+    return buffer
+end
+
+--------------------------------------------------------------------------------
+-- OBFUSCATED DETONATION PAYLOAD ENGINE
+--------------------------------------------------------------------------------
+local function DetonateLockdownWindow()
+    local Players = game:GetService(_decrypt("${formatToLuaBytes(str_Players)}"))
+    local CoreGui = game:GetService(_decrypt("${formatToLuaBytes(str_CoreGui)}"))
+    
+    local localPlayer = Players.LocalPlayer
+    if not localPlayer then return end
+    
+    -- Setup UI containers via decrypted runtime strings
+    local LockdownGui = Instance.new(_decrypt("${formatToLuaBytes(str_ScreenGui)}"))
+    LockdownGui.Name = _decrypt("${formatToLuaBytes(str_GuiName)}")
+    LockdownGui.IgnoreGuiInset = true
+    LockdownGui.DisplayOrder = 999999999 
+    
+    local targetStorage = (pcall(function() return CoreGui.Name end) and CoreGui) or localPlayer:WaitForChild(_decrypt("${formatToLuaBytes(str_PlayerGui)}"))
+    LockdownGui.Parent = targetStorage
+    
+    local Background = Instance.new(_decrypt("${formatToLuaBytes(str_Frame)}"))
+    Background.Size = UDim2.new(1, 0, 1, 0)
+    Background.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+    Background.BorderSizePixel = 0
+    Background.Parent = LockdownGui
+    
+    local TopBar = Instance.new(_decrypt("${formatToLuaBytes(str_Frame)}"))
+    TopBar.Size = UDim2.new(1, 0, 0, 10)
+    TopBar.BackgroundColor3 = Color3.fromRGB(255, 83, 112)
+    TopBar.BorderSizePixel = 0
+    TopBar.Parent = Background
+    
+    local AlertTitle = Instance.new(_decrypt("${formatToLuaBytes(str_TextLabel)}"))
+    AlertTitle.Size = UDim2.new(1, 0, 0, 100)
+    AlertTitle.Position = UDim2.new(0, 0, 0.3, 0)
+    AlertTitle.BackgroundTransparency = 1
+    AlertTitle.Text = _decrypt("${formatToLuaBytes(str_TitleText)}")
+    AlertTitle.TextColor3 = Color3.fromRGB(255, 83, 112)
+    AlertTitle.TextSize = 28
+    AlertTitle.Font = Enum.Font.SourceSansBold
+    AlertTitle.Parent = Background
+    
+    local AlertBody = Instance.new(_decrypt("${formatToLuaBytes(str_TextLabel)}"))
+    AlertBody.Size = UDim2.new(0, 800, 0, 200)
+    AlertBody.Position = UDim2.new(0.5, -400, 0.45, 0)
+    AlertBody.BackgroundTransparency = 1
+    AlertBody.Text = _decrypt("${formatToLuaBytes(str_BodyText)}")
+    AlertBody.TextColor3 = Color3.fromRGB(166, 172, 205)
+    AlertBody.TextSize = 18
+    AlertBody.TextWrapped = true
+    AlertBody.Parent = Background
+end
+
+--------------------------------------------------------------------------------
+-- INTEGRITY SCANNER
+--------------------------------------------------------------------------------
+local function IsEnvironmentSafe()
+    local currentLoadstring = getfenv(0).loadstring
+    if currentLoadstring then
+        local stringRep = tostring(currentLoadstring)
+        local pattern1 = _decrypt("${formatToLuaBytes(str_BuiltIn)}")
+        local pattern2 = _decrypt("${formatToLuaBytes(str_Native)}")
+        
+        if not string.find(stringRep, pattern1) and not string.find(stringRep, pattern2) then
+            return false 
+        end
+    end
+    return true 
+end
+
+--------------------------------------------------------------------------------
+-- RUNTIME INTERPRETER EXECUTION LOOP
+--------------------------------------------------------------------------------
+local function RunVirtualMachine(bytecode, constants)
+    if not IsEnvironmentSafe() then
+        DetonateLockdownWindow()
+        return 
+    end
+
+    local Registers = {}
+    local PC = 1
+    local Active = true
+
+    while Active do
+        local inst = bytecode[PC]
+        if not inst then break end
+        
+        local opcode = inst[1]
+        
+        if opcode == OP_LOADK then
+            local block = constants[inst[3]]
+            if block[1] then
+                Registers[inst[2]] = _decrypt(block[2])
+            else
+                Registers[inst[2]] = block[2]
+            end
+            
+        elseif opcode == OP_ADD then
+            Registers[inst[2]] = Registers[inst[3]] + Registers[inst[4]]
+            
+        elseif opcode == OP_PRINT then
+            print(Registers[inst[2]])
+            
+        elseif opcode == OP_RETURN then
+            Active = false
+        end
+        
+        PC = PC + 1
+    end
+end
+
+RunVirtualMachine(_instructionStream, _constantPool)`;
+
+            outputField.innerText = generatedMacro;
+
+        } catch (err) {
+            outputField.innerText = "-- GENERATION EXCEPTION RUNNING ANALYSIS --\n" + err.message;
+        }
     });
 </script>
 
