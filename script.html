@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AltWare Beta - Loader</title>
+    <style>
+        :root {
+            --bg: #0d0d11;
+            --card: #16161e;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --text: #f3f4f6;
+            --text-dim: #9ca3af;
+            --border: #262636;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.8rem;
+            color: var(--text);
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .code-box {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: "Fira Code", monospace, sans-serif;
+            font-size: 0.85rem;
+            word-break: break-all;
+            color: #a7f3d0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="badge">Roblox Script</div>
+    <h1>AltWare Beta</h1>
+    <p>Click below to copy the loadstring directly to your clipboard.</p>
+
+    <div class="code-box" id="scriptBox">loadstring(game:HttpGet("https://pastebin.com/raw/zg9m6G4z"))()</div>
+
+    <button class="btn" id="copyBtn" onclick="copyScript()">Copy Loadstring</button>
+</div>
+
+<script>
+    function copyScript() {
+        const scriptText = document.getElementById('scriptBox').innerText;
+        navigator.clipboard.writeText(scriptText).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = "✓ Copied to Clipboard!";
+            btn.style.backgroundColor = "#10b981"; // green success feedback
+
+            setTimeout(() => {
+                btn.innerText = "Copy Loadstring";
+                btn.style.backgroundColor = ""; 
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
